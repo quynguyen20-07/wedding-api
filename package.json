@@ -1,0 +1,42 @@
+{
+  "name": "wedding-api",
+  "version": "1.0.0",
+  "description": "wedding-api server",
+  "main": "src/app.ts",
+  "scripts": {
+    "dev": "ts-node-dev --respawn src/app.ts",
+    "build": "tsc",
+    "start": "node dist/app.js",
+    "test": "echo \"No tests yet\" && exit 0"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^7.5.0",
+    "graphql": "^16.8.1",
+    "apollo-server-express": "^3.13.0",
+    "dotenv": "^16.3.1",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "winston": "^3.11.0",
+    "swagger-ui-express": "^5.0.1",
+    "express-rate-limit": "^7.1.5"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.8.10",
+    "@types/cors": "^2.8.15",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.5",
+    "@types/swagger-ui-express": "^4.1.6",
+    "typescript": "^5.2.2",
+    "ts-node-dev": "^2.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com-quy:quynguyen20-07/wedding-api.git"
+  },
+  "author": "Nguyen The Quy",
+  "license": "ISC"
+}
