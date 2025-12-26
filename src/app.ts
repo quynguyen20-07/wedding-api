@@ -1,14 +1,14 @@
 import { ApolloServer } from "apollo-server-express";
 import swaggerUi from "swagger-ui-express";
 import rateLimit from "express-rate-limit";
-import { readFileSync } from "fs";
 import mongoose from "mongoose";
 import express from "express";
 import helmet from "helmet";
 import dotenv from "dotenv";
-import path from "path";
 import http from "http";
 import cors from "cors";
+
+import swaggerDocument from "./swagger.json";
 
 dotenv.config();
 
@@ -34,7 +34,7 @@ class WeddingApp {
     this.app.use(cors());
 
     const limiter = rateLimit({
-      windowMs: 15 * 60 * 1000, // 15 phút
+      windowMs: 15 * 60 * 1000,
       max: 100,
     });
     this.app.use("/graphql", limiter);
@@ -72,7 +72,12 @@ class WeddingApp {
   }
 
   private initializeRoutes(): void {
-    // Health check
+    this.app.use(
+      "/api-docs",
+      swaggerUi.serve as any,
+      swaggerUi.setup(swaggerDocument) as any
+    );
+
     this.app.get("/health", (_req, res) => {
       res.json({
         status: "OK",
@@ -83,7 +88,6 @@ class WeddingApp {
       });
     });
 
-    // API info
     this.app.get("/", (_req, res) => {
       res.json({
         name: "Wedding Management API",
@@ -93,7 +97,6 @@ class WeddingApp {
       });
     });
 
-    // 404 handler
     this.app.use((req, res) => {
       res.status(404).json({
         error: "Not Found",
@@ -126,10 +129,14 @@ class WeddingApp {
       console.log(`🚀 Server running on port ${this.port}`);
       console.log(`📊 GraphQL: http://localhost:${this.port}/graphql`);
       console.log(`🏥 Health: http://localhost:${this.port}/health`);
+      console.log(`📖 Swagger docs: http://localhost:${this.port}/api-docs`);
+      console.log(`🌐 Environment: ${process.env.NODE_ENV}`);
+      console.log(
+        `🗄️  Database: ${mongoose.connection.host || "not connected yet"}`
+      );
     });
   }
 }
 
-// Start server
 const weddingApp = new WeddingApp();
 weddingApp.start().catch(console.error);
