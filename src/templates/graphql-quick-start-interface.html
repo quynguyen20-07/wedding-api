@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Wedding API Test Interface</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      header {
+        text-align: center;
+        margin-bottom: 40px;
+        padding: 30px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        color: #2c3e50;
+        margin-bottom: 10px;
+        font-size: 2.5em;
+      }
+
+      .subtitle {
+        color: #7f8c8d;
+        font-size: 1.2em;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 30px;
+        margin-bottom: 40px;
+      }
+
+      .card {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+      }
+
+      .card h3 {
+        color: #3498db;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #f0f0f0;
+        font-size: 1.5em;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        color: #2c3e50;
+        font-weight: 600;
+      }
+
+      input,
+      textarea,
+      select {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: border-color 0.3s ease;
+      }
+
+      input:focus,
+      textarea:focus,
+      select:focus {
+        outline: none;
+        border-color: #3498db;
+      }
+
+      textarea {
+        min-height: 120px;
+        resize: vertical;
+        font-family: monospace;
+      }
+
+      .btn {
+        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        color: white;
+        border: none;
+        padding: 14px 28px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-block;
+        text-decoration: none;
+        text-align: center;
+        margin-top: 10px;
+      }
+
+      .btn:hover {
+        background: linear-gradient(135deg, #2980b9 0%, #1f6396 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+      }
+
+      .btn-secondary {
+        background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+      }
+
+      .btn-success {
+        background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+      }
+
+      .btn-danger {
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+      }
+
+      .query-box {
+        background: #2c3e50;
+        color: #ecf0f1;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 15px 0;
+        font-family: "Courier New", monospace;
+        font-size: 14px;
+        line-height: 1.5;
+        overflow-x: auto;
+      }
+
+      .result {
+        background: #f8f9fa;
+        border-left: 4px solid #3498db;
+        padding: 20px;
+        border-radius: 0 8px 8px 0;
+        margin-top: 20px;
+        font-family: monospace;
+        font-size: 14px;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        max-height: 400px;
+        overflow-y: auto;
+      }
+
+      .result.success {
+        border-left-color: #2ecc71;
+        background: #e8f6ef;
+      }
+
+      .result.error {
+        border-left-color: #e74c3c;
+        background: #fdeaea;
+      }
+
+      .loading {
+        text-align: center;
+        padding: 20px;
+        color: #7f8c8d;
+      }
+
+      .loading::after {
+        content: "...";
+        animation: dots 1.5s infinite;
+      }
+
+      @keyframes dots {
+        0%,
+        20% {
+          content: ".";
+        }
+        40% {
+          content: "..";
+        }
+        60%,
+        100% {
+          content: "...";
+        }
+      }
+
+      .links {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin-top: 30px;
+        justify-content: center;
+      }
+
+      .endpoints {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        margin-top: 40px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+      }
+
+      .endpoints h3 {
+        color: #2c3e50;
+        margin-bottom: 20px;
+      }
+
+      .endpoint-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 15px;
+      }
+
+      .endpoint-item {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        border-left: 4px solid #3498db;
+      }
+
+      .method {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: bold;
+        margin-right: 10px;
+      }
+
+      .method.get {
+        background: #61affe;
+        color: white;
+      }
+
+      .method.post {
+        background: #49cc90;
+        color: white;
+      }
+
+      .path {
+        font-family: monospace;
+        color: #2c3e50;
+      }
+
+      .description {
+        color: #7f8c8d;
+        font-size: 14px;
+        margin-top: 5px;
+      }
+
+      .token-display {
+        background: #2c3e50;
+        color: white;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 20px 0;
+        font-family: monospace;
+        word-break: break-all;
+        display: none;
+      }
+
+      .token-display.show {
+        display: block;
+      }
+
+      .copy-btn {
+        background: #34495e;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-top: 10px;
+        font-size: 14px;
+      }
+
+      .copy-btn:hover {
+        background: #2c3e50;
+      }
+
+      @media (max-width: 768px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+
+        .endpoint-list {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>🎉 Wedding Management API</h1>
+        <p class="subtitle">Complete Test Interface for Wedding Management System</p>
+      </header>
+
+      <div class="grid">
+        <!-- Register Card -->
+        <div class="card">
+          <h3>👤 Register User</h3>
+          <form id="registerForm">
+            <div class="form-group">
+              <label for="regEmail">Email</label>
+              <input
+                type="email"
+                id="regEmail"
+                placeholder="user@example.com"
+                value="test@example.com"
+              />
+            </div>
+            <div class="form-group">
+              <label for="regPassword">Password</label>
+              <input
+                type="password"
+                id="regPassword"
+                value="password123"
+                placeholder="Your password"
+              />
+            </div>
+            <div class="form-group">
+              <label for="regFullName">Full Name</label>
+              <input
+                type="text"
+                id="regFullName"
+                value="Test User"
+                placeholder="John Doe"
+              />
+            </div>
+            <div class="form-group">
+              <label for="regPhone">Phone (Optional)</label>
+              <input
+                type="tel"
+                id="regPhone"
+                value="0123456789"
+                placeholder="Phone number"
+              />
+            </div>
+            <button type="submit" class="btn btn-success">Register</button>
+          </form>
+          <div class="query-box">
+mutation Register($email: String!, $password: String!, $fullName: String!, $phone: String) {
+  register(email: $email, password: $password, fullName: $fullName, phone: $phone) {
+    user {
+      id
+      email
+      fullName
+      phone
+      role
+    }
+    accessToken
+    refreshToken
+  }
+}
+          </div>
+          <div id="registerResult" class="result"></div>
+        </div>
+
+        <!-- Login Card -->
+        <div class="card">
+          <h3>🔐 Login User</h3>
+          <form id="loginForm">
+            <div class="form-group">
+              <label for="loginEmail">Email</label>
+              <input
+                type="email"
+                id="loginEmail"
+                placeholder="user@example.com"
+                value="test@example.com"
+              />
+            </div>
+            <div class="form-group">
+              <label for="loginPassword">Password</label>
+              <input
+                type="password"
+                id="loginPassword"
+                value="password123"
+                placeholder="Your password"
+              />
+            </div>
+            <button type="submit" class="btn">Login</button>
+          </form>
+          <div class="query-box">
+mutation Login($email: String!, $password: String!) {
+  login(email: $email, password: $password) {
+    user {
+      id
+      email
+      fullName
+      role
+    }
+    accessToken
+    refreshToken
+  }
+}
+          </div>
+          <div id="loginResult" class="result"></div>
+        </div>
+
+        <!-- Get Current User -->
+        <div class="card">
+          <h3>👤 Get Current User</h3>
+          <p>Requires authentication token</p>
+          <button onclick="getCurrentUser()" class="btn">Get My Info</button>
+          <div class="query-box">
+query Me {
+  me {
+    id
+    email
+    fullName
+    phone
+    role
+    isActive
+    createdAt
+    updatedAt
+  }
+}
+          </div>
+          <div id="meResult" class="result"></div>
+        </div>
+
+        <!-- Create Wedding -->
+        <div class="card">
+          <h3>💍 Create Wedding</h3>
+          <form id="createWeddingForm">
+            <div class="form-group">
+              <label for="weddingTitle">Wedding Title</label>
+              <input
+                type="text"
+                id="weddingTitle"
+                value="Our Beautiful Wedding"
+                placeholder="Wedding title"
+              />
+            </div>
+            <div class="form-group">
+              <label for="weddingSlug">Slug (URL friendly)</label>
+              <input
+                type="text"
+                id="weddingSlug"
+                value="our-wedding-2024"
+                placeholder="our-wedding"
+              />
+            </div>
+            <div class="form-group">
+              <label for="weddingLanguage">Language</label>
+              <select id="weddingLanguage">
+                <option value="en">English</option>
+                <option value="vi">Vietnamese</option>
+                <option value="fr">French</option>
+                <option value="es">Spanish</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-success">Create Wedding</button>
+          </form>
+          <div class="query-box">
+mutation CreateWedding($title: String!, $slug: String, $language: String) {
+  createWedding(title: $title, slug: $slug, language: $language) {
+    id
+    title
+    slug
+    status
+    language
+    createdAt
+    updatedAt
+  }
+}
+          </div>
+          <div id="weddingResult" class="result"></div>
+        </div>
+      </div>
+
+      <!-- Token Display -->
+      <div id="tokenDisplay" class="token-display">
+        <strong>Current Token:</strong>
+        <div id="currentToken"></div>
+        <button onclick="copyToken()" class="copy-btn">Copy Token</button>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="card">
+        <h3>⚡ Quick Actions</h3>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap">
+          <button onclick="clearAllResults()" class="btn btn-secondary">
+            Clear All Results
+          </button>
+          <button onclick="copyAllQueries()" class="btn">Copy All Queries</button>
+          <button onclick="testConnection()" class="btn">Test Connection</button>
+        </div>
+      </div>
+
+      <!-- Endpoints -->
+      <div class="endpoints">
+        <h3>🔗 Available Endpoints</h3>
+        <div class="endpoint-list">
+          <div class="endpoint-item">
+            <span class="method get">GET</span>
+            <span class="path">/</span>
+            <div class="description">API Information</div>
+          </div>
+          <div class="endpoint-item">
+            <span class="method get">GET</span>
+            <span class="path">/health</span>
+            <div class="description">Health Check</div>
+          </div>
+          <div class="endpoint-item">
+            <span class="method get">GET</span>
+            <span class="path">/playground</span>
+            <div class="description">GraphQL Playground</div>
+          </div>
+          <div class="endpoint-item">
+            <span class="method get">GET</span>
+            <span class="path">/api-docs</span>
+            <div class="description">API Documentation</div>
+          </div>
+          <div class="endpoint-item">
+            <span class="method post">POST</span>
+            <span class="path">/graphql</span>
+            <div class="description">GraphQL Endpoint</div>
+          </div>
+          <div class="endpoint-item">
+            <span class="method get">GET</span>
+            <span class="path">/uploads/*</span>
+            <div class="description">Static Files</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Links -->
+      <div class="links">
+        <a href="/playground" target="_blank" class="btn">🎮 GraphQL Playground</a>
+        <a href="/api-docs" target="_blank" class="btn">📖 API Documentation</a>
+        <a href="/health" target="_blank" class="btn">🏥 Health Check</a>
+        <a href="/" target="_blank" class="btn">🏠 Home</a>
+      </div>
+    </div>
+
+    <script>
+      let currentToken = localStorage.getItem("weddingApiToken") || "";
+
+      // Initialize token display
+      updateTokenDisplay();
+
+      // Register form
+      document.getElementById("registerForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const email = document.getElementById("regEmail").value;
+        const password = document.getElementById("regPassword").value;
+        const fullName = document.getElementById("regFullName").value;
+        const phone = document.getElementById("regPhone").value;
+
+        const mutation = `
+          mutation Register($email: String!, $password: String!, $fullName: String!, $phone: String) {
+            register(email: $email, password: $password, fullName: $fullName, phone: $phone) {
+              user {
+                id
+                email
+                fullName
+                phone
+                role
+              }
+              accessToken
+              refreshToken
+            }
+          }
+        `;
+
+        const resultDiv = document.getElementById("registerResult");
+        resultDiv.innerHTML = '<div class="loading">Registering user</div>';
+
+        try {
+          const response = await fetch("/graphql", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              query: mutation,
+              variables: { email, password, fullName, phone },
+            }),
+          });
+
+          const data = await response.json();
+          if (data.errors) {
+            throw new Error(data.errors[0].message);
+          }
+
+          // Store token
+          currentToken = data.data.register.accessToken;
+          localStorage.setItem("weddingApiToken", currentToken);
+          updateTokenDisplay();
+
+          resultDiv.className = "result success";
+          resultDiv.innerHTML = `<pre>${JSON.stringify(data.data, null, 2)}</pre>`;
+        } catch (error) {
+          resultDiv.className = "result error";
+          resultDiv.innerHTML = `<pre>Error: ${error.message}</pre>`;
+        }
+      });
+
+      // Login form
+      document.getElementById("loginForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const email = document.getElementById("loginEmail").value;
+        const password = document.getElementById("loginPassword").value;
+
+        const mutation = `
+          mutation Login($email: String!, $password: String!) {
+            login(email: $email, password: $password) {
+              user {
+                id
+                email
+                fullName
+                role
+              }
+              accessToken
+              refreshToken
+            }
+          }
+        `;
+
+        const resultDiv = document.getElementById("loginResult");
+        resultDiv.innerHTML = '<div class="loading">Logging in</div>';
+
+        try {
+          const response = await fetch("/graphql", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              query: mutation,
+              variables: { email, password },
+            }),
+          });
+
+          const data = await response.json();
+          if (data.errors) {
+            throw new Error(data.errors[0].message);
+          }
+
+          // Store token
+          currentToken = data.data.login.accessToken;
+          localStorage.setItem("weddingApiToken", currentToken);
+          updateTokenDisplay();
+
+          resultDiv.className = "result success";
+          resultDiv.innerHTML = `<pre>${JSON.stringify(data.data, null, 2)}</pre>`;
+        } catch (error) {
+          resultDiv.className = "result error";
+          resultDiv.innerHTML = `<pre>Error: ${error.message}</pre>`;
+        }
+      });
+
+      // Create wedding form
+      document.getElementById("createWeddingForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const title = document.getElementById("weddingTitle").value;
+        const slug = document.getElementById("weddingSlug").value;
+        const language = document.getElementById("weddingLanguage").value;
+
+        const mutation = `
+          mutation CreateWedding($title: String!, $slug: String, $language: String) {
+            createWedding(title: $title, slug: $slug, language: $language) {
+              id
+              title
+              slug
+              status
+              language
+              createdAt
+              updatedAt
+            }
+          }
+        `;
+
+        const resultDiv = document.getElementById("weddingResult");
+        resultDiv.innerHTML = '<div class="loading">Creating wedding</div>';
+
+        try {
+          const response = await fetch("/graphql", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: currentToken ? `Bearer ${currentToken}` : "",
+            },
+            body: JSON.stringify({
+              query: mutation,
+              variables: { title, slug, language },
+            }),
+          });
+
+          const data = await response.json();
+          if (data.errors) {
+            throw new Error(data.errors[0].message);
+          }
+
+          resultDiv.className = "result success";
+          resultDiv.innerHTML = `<pre>${JSON.stringify(data.data, null, 2)}</pre>`;
+        } catch (error) {
+          resultDiv.className = "result error";
+          resultDiv.innerHTML = `<pre>Error: ${error.message}</pre>`;
+        }
+      });
+
+      // Get current user
+      async function getCurrentUser() {
+        const query = `
+          query Me {
+            me {
+              id
+              email
+              fullName
+              phone
+              role
+              isActive
+              createdAt
+              updatedAt
+            }
+          }
+        `;
+
+        const resultDiv = document.getElementById("meResult");
+        resultDiv.innerHTML = '<div class="loading">Fetching user info</div>';
+
+        try {
+          const response = await fetch("/graphql", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: currentToken ? `Bearer ${currentToken}` : "",
+            },
+            body: JSON.stringify({ query }),
+          });
+
+          const data = await response.json();
+          if (data.errors) {
+            throw new Error(data.errors[0].message);
+          }
+
+          resultDiv.className = "result success";
+          resultDiv.innerHTML = `<pre>${JSON.stringify(data.data, null, 2)}</pre>`;
+        } catch (error) {
+          resultDiv.className = "result error";
+          resultDiv.innerHTML = `<pre>Error: ${error.message}</pre>`;
+        }
+      }
+
+      // Test connection
+      async function testConnection() {
+        try {
+          const response = await fetch("/health");
+          const data = await response.json();
+          alert(`✅ Connection successful!\nStatus: ${data.status}\nDatabase: ${data.database}`);
+        } catch (error) {
+          alert(`❌ Connection failed: ${error.message}`);
+        }
+      }
+
+      // Utility functions
+      function updateTokenDisplay() {
+        const tokenDisplay = document.getElementById("tokenDisplay");
+        const currentTokenEl = document.getElementById("currentToken");
+
+        if (currentToken) {
+          tokenDisplay.classList.add("show");
+          currentTokenEl.textContent = currentToken;
+        } else {
+          tokenDisplay.classList.remove("show");
+        }
+      }
+
+      function copyToken() {
+        navigator.clipboard.writeText(currentToken);
+        alert("Token copied to clipboard!");
+      }
+
+      function clearAllResults() {
+        document.querySelectorAll(".result").forEach((el) => {
+          el.innerHTML = "";
+          el.className = "result";
+        });
+        alert("All results cleared!");
+      }
+
+      function copyAllQueries() {
+        const queries = Array.from(document.querySelectorAll(".query-box"))
+          .map((el) => el.textContent)
+          .join("\n\n");
+        navigator.clipboard.writeText(queries);
+        alert("All queries copied to clipboard!");
+      }
+
+      // Auto-fill with sample data
+      function autoFill() {
+        document.getElementById("regEmail").value = `test${Date.now()}@example.com`;
+        document.getElementById("regPassword").value = "password123";
+        document.getElementById("regFullName").value = "Test User";
+        document.getElementById("regPhone").value = "0123456789";
+
+        document.getElementById("loginEmail").value = "test@example.com";
+        document.getElementById("loginPassword").value = "password123";
+
+        document.getElementById("weddingTitle").value = `Wedding ${new Date().getFullYear()}`;
+        document.getElementById("weddingSlug").value = `wedding-${Date.now()}`;
+      }
+
+      // Auto-fill on page load
+      window.addEventListener("load", autoFill);
+    </script>
+  </body>
+</html>
