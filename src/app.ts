@@ -96,6 +96,7 @@ class WeddingApp {
           };
         },
         introspection: true,
+        cache: process.env.NODE_ENV === "production" ? "bounded" : undefined,
       });
 
       await server.start();
