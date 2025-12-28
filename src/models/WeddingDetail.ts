@@ -1,5 +1,4 @@
-import { Schema, model, Document, Types } from 'mongoose';
-
+import { Schema, model, Document, Types } from "mongoose";
 
 export interface IBrideGroom {
   fullName: string;
@@ -11,7 +10,7 @@ export interface IBrideGroom {
 
 export interface IWeddingEvent {
   title: string;
-  type: 'ceremony' | 'reception' | 'party';
+  type: "ceremony" | "reception" | "party";
   eventDate: Date;
   startTime?: string;
   endTime?: string;
@@ -47,10 +46,10 @@ const BrideGroomSchema = new Schema({
 
 const WeddingEventSchema = new Schema({
   title: { type: String, required: true },
-  type: { 
-    type: String, 
-    enum: ['ceremony', 'reception', 'party'],
-    required: true 
+  type: {
+    type: String,
+    enum: ["ceremony", "reception", "party"],
+    required: true,
   },
   eventDate: { type: Date, required: true },
   startTime: String,
@@ -73,7 +72,7 @@ const WeddingDetailSchema = new Schema<IWeddingDetail>(
   {
     weddingId: {
       type: Schema.Types.ObjectId,
-      ref: 'Wedding',
+      ref: "Wedding",
       required: true,
       unique: true,
     },
@@ -87,4 +86,7 @@ const WeddingDetailSchema = new Schema<IWeddingDetail>(
   }
 );
 
-export const WeddingDetail = model<IWeddingDetail>('WeddingDetail', WeddingDetailSchema);
+export const WeddingDetail = model<IWeddingDetail>(
+  "WeddingDetail",
+  WeddingDetailSchema
+);

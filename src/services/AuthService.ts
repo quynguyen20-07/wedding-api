@@ -1,3 +1,4 @@
+import { Logger } from "winston";
 import jwt from "jsonwebtoken";
 
 import {
@@ -51,12 +52,12 @@ export class AuthService {
   ): Promise<{ user: IUser; tokens: AuthTokens }> {
     const user = await this.userRepository.findByEmail(credentials.email);
     if (!user) {
-      throw new AppError("Invalid credentials", 401);
+      throw new AppError("Không tìm thấy người dùng", 401);
     }
 
     const isValidPassword = await user.comparePassword(credentials.password);
     if (!isValidPassword) {
-      throw new AppError("Invalid credentials", 401);
+      throw new AppError("Mật khẩu không đúng", 401);
     }
 
     const tokens = this.generateTokens({
@@ -111,18 +112,26 @@ export class AuthService {
   }
 
   private generateTokens(payload: TokenPayload): AuthTokens {
-    const expiresIn = process.env.JWT_EXPIRES_IN
-      ? parseInt(process.env.JWT_EXPIRES_IN, 10)
-      : undefined;
-    const refreshExpiresIn = process.env.JWT_REFRESH_EXPIRES_IN
-      ? parseInt(process.env.JWT_REFRESH_EXPIRES_IN, 10)
-      : undefined;
-    const accessToken = jwt.sign(payload, process.env.JWT_SECRET!, {
-      expiresIn,
+    const expiresIn = process.env.JWT_EXPIRES_IN || "1d";
+    const refreshExpiresIn = process.env.JWT_REFRESH_EXPIRES_IN || "7d";
+
+    const jwtSecret = process.env.JWT_SECRET;
+    const jwtRefreshSecret = process.env.JWT_REFRESH_SECRET;
+
+    if (!jwtSecret) {
+      throw new AppError("JWT_SECRET is not configured", 500);
+    }
+
+    if (!jwtRefreshSecret) {
+      throw new AppError("JWT_REFRESH_SECRET is not configured", 500);
+    }
+
+    const accessToken = jwt.sign(payload, jwtSecret, {
+      expiresIn: expiresIn as jwt.SignOptions["expiresIn"],
     });
 
-    const refreshToken = jwt.sign(payload, process.env.JWT_REFRESH_SECRET!, {
-      expiresIn: refreshExpiresIn,
+    const refreshToken = jwt.sign(payload, jwtRefreshSecret, {
+      expiresIn: refreshExpiresIn as jwt.SignOptions["expiresIn"],
     });
 
     return { accessToken, refreshToken };

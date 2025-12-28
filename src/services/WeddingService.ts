@@ -20,12 +20,13 @@ export class WeddingService {
   ): Promise<IWedding> {
     const slug = data.slug || generateSlug(data.title);
 
+    // Check if slug exists
     const existing = await this.weddingRepository.findBySlug(slug);
     if (existing) {
       throw new AppError("Slug already exists", 400);
     }
 
-    // SỬA: Chuẩn bị data với đầy đủ themeSettings
+    // Default theme settings
     const themeSettings = {
       primaryColor: data.themeSettings?.primaryColor || "#F7E7CE",
       secondaryColor: data.themeSettings?.secondaryColor || "#F4B6C2",
@@ -34,28 +35,76 @@ export class WeddingService {
       backgroundMusic: data.themeSettings?.backgroundMusic,
     };
 
+    // Default bride info
+    const defaultBride = {
+      fullName: data.bride?.fullName || "Cô Dâu",
+      avatar: data.bride?.avatar || "/default-avatar-bride.png",
+      shortBio:
+        data.bride?.shortBio || "Hạnh phúc là được ở bên người mình yêu",
+      familyInfo: data.bride?.familyInfo,
+      socialLinks: data.bride?.socialLinks || {},
+    };
+
+    // Default groom info
+    const defaultGroom = {
+      fullName: data.groom?.fullName || "Chú Rể",
+      avatar: data.groom?.avatar || "/default-avatar-groom.png",
+      shortBio:
+        data.groom?.shortBio || "Yêu là khi tìm thấy nửa còn lại của mình",
+      familyInfo: data.groom?.familyInfo,
+      socialLinks: data.groom?.socialLinks || {},
+    };
+
+    // Create wedding
     const wedding = await this.weddingRepository.create({
-      userId: new Types.ObjectId(userId), // SỬA: Convert string sang ObjectId
+      userId: new Types.ObjectId(userId),
       title: data.title,
       slug,
+      weddingDate:
+        data.weddingDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // Default: 30 days from now
       language: data.language || "vi",
-      themeSettings, // Truyền đã đầy đủ
+      themeSettings,
     });
 
-    // Create wedding detail
+    // Create wedding detail with bride and groom info
     await WeddingDetail.create({
       weddingId: wedding._id,
-      bride: { fullName: "" },
-      groom: { fullName: "" },
+      bride: defaultBride,
+      groom: defaultGroom,
       loveStories: [],
       weddingEvents: [],
     });
+
+    // Add a default wedding event (ceremony) based on wedding date
+    if (data.weddingDate) {
+      const weddingDetail = await WeddingDetail.findOne({
+        weddingId: wedding._id,
+      });
+      if (weddingDetail) {
+        const ceremonyEvent = {
+          title: "Lễ Thành Hôn",
+          type: "ceremony" as const,
+          eventDate: data.weddingDate,
+          startTime: "08:00",
+          endTime: "12:00",
+          address: "Nhà thờ / Địa điểm tổ chức",
+          description: "Lễ cưới chính thức của cô dâu và chú rể",
+        };
+
+        weddingDetail.weddingEvents.push(ceremonyEvent);
+        await weddingDetail.save();
+      }
+    }
 
     return wedding;
   }
 
   async getUserWeddings(userId: string): Promise<IWedding[]> {
     return this.weddingRepository.findByUserId(userId);
+  }
+
+  async getWeddings(): Promise<IWedding[]> {
+    return this.weddingRepository.findList();
   }
 
   async getWeddingById(id: string, userId?: string): Promise<IWedding | null> {

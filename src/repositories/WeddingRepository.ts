@@ -10,6 +10,10 @@ export class WeddingRepository extends BaseRepository<IWedding> {
     return this.findAll({ userId, isActive: true });
   }
 
+  async findList(): Promise<IWedding[]> {
+    return this.findAll();
+  }
+
   async findBySlug(slug: string): Promise<IWedding | null> {
     return this.findOne({ slug, isActive: true });
   }

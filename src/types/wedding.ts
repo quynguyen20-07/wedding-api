@@ -1,10 +1,9 @@
 // src/types/wedding.ts - THÊM TYPE CHO CREATION
-import { Types } from 'mongoose';
+import { Types } from "mongoose";
 
-
-export type WeddingStatus = 'draft' | 'published' | 'archived';
-export type WeddingLanguage = 'vi' | 'en';
-export type EventType = 'ceremony' | 'reception' | 'party';
+export type WeddingStatus = "draft" | "published" | "archived";
+export type WeddingLanguage = "vi" | "en";
+export type EventType = "ceremony" | "reception" | "party";
 
 export interface ThemeSettings {
   primaryColor: string;
@@ -44,7 +43,7 @@ export interface LoveStory {
 
 export interface Wedding {
   id: string;
-  userId: Types.ObjectId; // SỬA THÀNH ObjectId
+  userId: Types.ObjectId;
   slug: string;
   title: string;
   status: WeddingStatus;
@@ -59,11 +58,25 @@ export interface Wedding {
   isActive: boolean;
 }
 
-// THÊM TYPE CHO CREATION INPUT
 export interface CreateWeddingData {
   title: string;
   slug?: string;
   language?: WeddingLanguage;
+  weddingDate?: Date;
+  bride?: {
+    fullName: string;
+    avatar?: string;
+    shortBio?: string;
+    familyInfo?: string;
+    socialLinks?: Record<string, string>;
+  };
+  groom?: {
+    fullName: string;
+    avatar?: string;
+    shortBio?: string;
+    familyInfo?: string;
+    socialLinks?: Record<string, string>;
+  };
   themeSettings?: {
     primaryColor?: string;
     secondaryColor?: string;

@@ -1,12 +1,12 @@
-import { Schema, model, Document, Types } from 'mongoose';
-
+import { Schema, model, Document, Types } from "mongoose";
 
 export interface IWedding extends Document {
   userId: Types.ObjectId;
   slug: string;
   title: string;
-  status: 'draft' | 'published' | 'archived';
-  language: 'vi' | 'en';
+  status: "draft" | "published" | "archived";
+  language: "vi" | "en";
+  weddingDate: Date;
   themeSettings: {
     primaryColor: string;
     secondaryColor: string;
@@ -23,7 +23,7 @@ const WeddingSchema = new Schema<IWedding>(
   {
     userId: {
       type: Schema.Types.ObjectId,
-      ref: 'User',
+      ref: "User",
       required: true,
     },
     slug: {
@@ -38,32 +38,37 @@ const WeddingSchema = new Schema<IWedding>(
       required: true,
       trim: true,
     },
+    weddingDate: {
+      type: Date,
+      required: true,
+      default: () => new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+    },
     status: {
       type: String,
-      enum: ['draft', 'published', 'archived'],
-      default: 'draft',
+      enum: ["draft", "published", "archived"],
+      default: "draft",
     },
     language: {
       type: String,
-      enum: ['vi', 'en'],
-      default: 'vi',
+      enum: ["vi", "en"],
+      default: "vi",
     },
     themeSettings: {
       primaryColor: {
         type: String,
-        default: '#F7E7CE',
+        default: "#F7E7CE",
       },
       secondaryColor: {
         type: String,
-        default: '#F4B6C2',
+        default: "#F4B6C2",
       },
       fontHeading: {
         type: String,
-        default: 'Playfair Display',
+        default: "Playfair Display",
       },
       fontBody: {
         type: String,
-        default: 'Inter',
+        default: "Inter",
       },
       backgroundMusic: String,
     },
@@ -86,4 +91,4 @@ WeddingSchema.index({ userId: 1 });
 WeddingSchema.index({ slug: 1 });
 WeddingSchema.index({ status: 1 });
 
-export const Wedding = model<IWedding>('Wedding', WeddingSchema);
+export const Wedding = model<IWedding>("Wedding", WeddingSchema);

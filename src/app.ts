@@ -76,7 +76,6 @@ class WeddingApp {
 
   private async initializeGraphQL(): Promise<void> {
     try {
-      // Đọc schema từ file
       const typeDefs = readFileSync(
         path.join(__dirname, "graphql/schema.graphql"),
         "utf-8"
@@ -263,8 +262,6 @@ class WeddingApp {
       console.log("✅ MongoDB connected successfully");
 
       const connection = mongoose.connection;
-      console.log(`🗄️  Database: ${connection.host}`);
-      console.log(`📊 Database Name: ${connection.name}`);
     } catch (error) {
       console.error("❌ MongoDB connection error:", error);
       process.exit(1);
@@ -293,15 +290,6 @@ class WeddingApp {
       );
       console.log(`📁 Uploads: http://localhost:${this.port}/uploads`);
       console.log(`🌐 Environment: ${process.env.NODE_ENV || "development"}`);
-      console.log("=".repeat(60));
-      console.log("\n🚀 Quick Start:");
-      console.log(`mutation {
-     register(email: "test@example.com", password: "password123", fullName: "Test User") {
-       user { id email }
-     
-     }
-   }`);
-      console.log("=".repeat(60) + "\n");
     });
   }
 }

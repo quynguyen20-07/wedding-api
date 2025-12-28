@@ -3,57 +3,79 @@ type Query {
   me: User
 
   # Weddings
+  userWeddings: [Wedding!]!
   weddings: [Wedding!]!
   wedding(id: ID!): Wedding
   weddingBySlug(slug: String!): Wedding
   searchWeddings(query: String!): [Wedding!]!
-  
+
   # Wedding Details
   weddingDetail(weddingId: ID!): WeddingDetail
-  
+
   # Guests
   guests(weddingId: ID!): [Guest!]!
   guestStats(weddingId: ID!): GuestStats!
-  
+
   # Public
   publicWedding(slug: String!): Wedding
 }
 
 type Mutation {
   # Auth
-  register(email: String!, password: String!, fullName: String!, phone: String): AuthPayload!
+  register(
+    email: String!
+    password: String!
+    fullName: String!
+    phone: String
+  ): AuthPayload!
   login(email: String!, password: String!): AuthPayload!
   logout: Boolean!
   refreshToken(refreshToken: String!): AuthPayload!
-  
+
   # Weddings
-  createWedding(title: String!, slug: String, language: String): Wedding!
+  createWedding(
+    title: String!
+    slug: String
+    language: String
+    weddingDate: String!
+    bride: BrideGroomInput!
+    groom: BrideGroomInput!
+    themeSettings: ThemeSettingInput
+  ): Wedding!
   updateWedding(id: ID!, title: String, slug: String, status: String): Wedding!
   deleteWedding(id: ID!): Wedding!
   publishWedding(id: ID!): Wedding!
   unpublishWedding(id: ID!): Wedding!
-  
+
   # Wedding Details
   updateBride(weddingId: ID!, bride: BrideGroomInput!): WeddingDetail!
   updateGroom(weddingId: ID!, groom: BrideGroomInput!): WeddingDetail!
   addLoveStory(weddingId: ID!, story: LoveStoryInput!): WeddingDetail!
-  updateLoveStory(weddingId: ID!, storyId: ID!, story: LoveStoryInput!): WeddingDetail!
+  updateLoveStory(
+    weddingId: ID!
+    storyId: ID!
+    story: LoveStoryInput!
+  ): WeddingDetail!
   deleteLoveStory(weddingId: ID!, storyId: ID!): WeddingDetail!
   addWeddingEvent(weddingId: ID!, event: WeddingEventInput!): WeddingDetail!
-  updateWeddingEvent(weddingId: ID!, eventId: ID!, event: WeddingEventInput!): WeddingDetail!
+  updateWeddingEvent(
+    weddingId: ID!
+    eventId: ID!
+    event: WeddingEventInput!
+  ): WeddingDetail!
   deleteWeddingEvent(weddingId: ID!, eventId: ID!): WeddingDetail!
-  
+
   # Guests
   addGuest(weddingId: ID!, guest: GuestInput!): Guest!
   updateGuest(id: ID!, guest: GuestInput!): Guest!
   deleteGuest(id: ID!): Guest!
   submitRSVP(weddingId: ID!, rsvp: RSVPInput!): Guest!
-  
+
   # Bank Accounts
   addBankAccount(weddingId: ID!, bankAccount: BankAccountInput!): BankAccount!
   updateBankAccount(id: ID!, bankAccount: BankAccountInput!): BankAccount!
   deleteBankAccount(id: ID!): BankAccount!
-  
+
   # Wishes
   addWish(weddingId: ID!, wish: WishInput!): Wish!
   approveWish(id: ID!): Wish!
@@ -79,6 +101,7 @@ type Wedding {
   userId: ID!
   slug: String!
   title: String!
+  weddingDate: String!
   status: String!
   language: String!
   themeSettings: ThemeSettings!
@@ -86,7 +109,7 @@ type Wedding {
   publishedAt: String
   createdAt: String!
   updatedAt: String!
-  weddingDetail: WeddingDetail  # <-- Thêm field này vào đây
+  weddingDetail: WeddingDetail
 }
 
 type ThemeSettings {
@@ -231,6 +254,14 @@ input GuestInput {
   dietaryRestrictions: String
   message: String
   tableNumber: String
+}
+
+input ThemeSettingInput {
+  primaryColor: String
+  secondaryColor: String
+  fontHeading: String
+  fontBody: String
+  backgroundMusic: String
 }
 
 input RSVPInput {

@@ -34,7 +34,6 @@ export const authenticate = async (
   }
 };
 
-// THÊM HÀM NÀY CHO GRAPHQL
 export const authenticateGraphQL = async (context: any) => {
   const { token } = context;
 

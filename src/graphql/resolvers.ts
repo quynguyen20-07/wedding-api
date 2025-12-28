@@ -17,10 +17,15 @@ export const resolvers = {
     },
 
     // Weddings
-    weddings: async (_: any, __: any, context: any) => {
+    userWeddings: async (_: any, __: any, context: any) => {
       const user = await authenticateGraphQL(context);
       const weddingService = new WeddingService();
       return weddingService.getUserWeddings(user._id.toString());
+    },
+
+    weddings: async (_: any, __: any) => {
+      const weddingService = new WeddingService();
+      return weddingService.getWeddings();
     },
 
     wedding: async (_: any, { id }: { id: string }, context: any) => {
@@ -91,12 +96,24 @@ export const resolvers = {
     // Auth
     register: async (_: any, args: any) => {
       const authService = new AuthService();
-      return authService.register(args);
+      const { user, tokens } = await authService.register(args);
+
+      return {
+        user,
+        accessToken: tokens.accessToken,
+        refreshToken: tokens.refreshToken,
+      };
     },
 
     login: async (_: any, args: any) => {
       const authService = new AuthService();
-      return authService.login(args);
+      const { user, tokens } = await authService.login(args);
+
+      return {
+        user,
+        accessToken: tokens.accessToken,
+        refreshToken: tokens.refreshToken,
+      };
     },
 
     logout: async (_: any, __: any, context: any) => {
