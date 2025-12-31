@@ -16,10 +16,10 @@
       }
     }
   ],
-  "routes": [
+  "rewrites": [
     {
-      "src": "/(.*)",
-      "dest": "dist/app.js"
+      "source": "/(.*)",
+      "destination": "/dist/app.js"
     }
   ],
   "headers": [
