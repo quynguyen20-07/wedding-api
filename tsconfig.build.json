@@ -9,10 +9,11 @@
     "rootDir": "./src"
   },
   "include": ["src/**/*"],
-  "exclude": [
-    "src/**/*.test.ts",
-    "src/**/*.spec.ts",
-    "src/app-simple.ts",
-    "src/scripts/"
-  ]
+  "exclude": ["node_modules", "dist", "test"]
+  // "exclude": [
+  //   "src/**/*.test.ts",
+  //   "src/**/*.spec.ts",
+  //   "src/app-simple.ts",
+  //   "src/scripts/"
+  // ],
 }

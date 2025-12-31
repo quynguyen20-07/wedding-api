@@ -1,0 +1,46 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Wedding Management API",
+        "version": "1.0.0",
+        "description": "API for managing weddings with GraphQL and REST endpoints"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:5000",
+            "description": "Development server"
+        }
+    ],
+    "paths": {
+        "/health": {
+            "get": {
+                "summary": "Health check endpoint",
+                "responses": {
+                    "200": {
+                        "description": "Server status"
+                    }
+                }
+            }
+        },
+        "/api/v1": {
+            "get": {
+                "summary": "API information",
+                "responses": {
+                    "200": {
+                        "description": "API details"
+                    }
+                }
+            }
+        },
+        "/graphql": {
+            "post": {
+                "summary": "GraphQL endpoint (use Playground for queries)",
+                "responses": {
+                    "200": {
+                        "description": "GraphQL response"
+                    }
+                }
+            }
+        }
+    }
+}
