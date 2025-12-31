@@ -1,10 +1,10 @@
+import express, { Request, Response, NextFunction } from "express";
 import { renderPlaygroundPage } from "graphql-playground-html";
 import { ApolloServer } from "apollo-server-express";
 import swaggerUi from "swagger-ui-express";
 import rateLimit from "express-rate-limit";
 import { readFileSync } from "fs";
 import mongoose from "mongoose";
-import express from "express";
 import helmet from "helmet";
 import dotenv from "dotenv";
 import path from "path";
@@ -17,18 +17,20 @@ import swaggerDocument from "./swagger.json";
 dotenv.config();
 
 class WeddingApp {
-  private app: express.Application;
+  public app: express.Application;
   private port: number;
   private httpServer: http.Server;
+  private initPromise: Promise<void> | null = null;
 
   constructor() {
     this.app = express();
     this.port = parseInt(process.env.PORT || "5000");
     this.httpServer = http.createServer(this.app);
+    this.initializeMiddleware();
+    this.initPromise = this.initializeAsync();
   }
 
   private initializeMiddleware(): void {
-    // Cấu hình Helmet với CSP cho phép GraphQL Playground
     this.app.use(
       helmet({
         contentSecurityPolicy: {
@@ -42,11 +44,7 @@ class WeddingApp {
               "https://cdn.jsdelivr.net",
             ],
             imgSrc: ["'self'", "data:", "https://cdn.jsdelivr.net"],
-            connectSrc: [
-              "'self'",
-              "https://cdn.jsdelivr.net",
-              "ws://localhost:" + this.port,
-            ],
+            connectSrc: ["'self'", "https://cdn.jsdelivr.net", "ws:"],
             fontSrc: ["'self'", "https://cdn.jsdelivr.net"],
           },
         },
@@ -74,6 +72,12 @@ class WeddingApp {
     this.app.use("/uploads", express.static("uploads"));
   }
 
+  private async initializeAsync(): Promise<void> {
+    await this.initializeDatabase();
+    await this.initializeGraphQL();
+    this.initializeRoutes();
+  }
+
   private async initializeGraphQL(): Promise<void> {
     try {
       const typeDefs = readFileSync(
@@ -84,7 +88,7 @@ class WeddingApp {
       const server = new ApolloServer({
         typeDefs,
         resolvers,
-        context: ({ req }) => {
+        context: ({ req }: { req: Request }) => {
           const token = req.headers.authorization?.replace("Bearer ", "") || "";
           return { token, req };
         },
@@ -109,6 +113,7 @@ class WeddingApp {
       console.log("✅ GraphQL server ready at /graphql");
     } catch (error) {
       console.error("❌ GraphQL initialization error:", error);
+      throw error;
     }
   }
 
@@ -117,11 +122,7 @@ class WeddingApp {
     this.app.use(
       "/api-docs",
       swaggerUi.serve as any,
-      (
-        req: express.Request,
-        res: express.Response,
-        next: express.NextFunction
-      ) => {
+      (req: Request, res: Response, next: NextFunction) => {
         res.setHeader(
           "Content-Security-Policy",
           "default-src 'self' https: 'unsafe-inline' 'unsafe-eval'; img-src 'self' https: data:; font-src 'self' https: data:"
@@ -143,7 +144,7 @@ class WeddingApp {
     );
 
     // GraphQL Playground
-    this.app.get("/playground", (_req, res) => {
+    this.app.get("/playground", (_req: Request, res: Response) => {
       res.setHeader("Content-Type", "text/html");
       const playground = renderPlaygroundPage({
         endpoint: "/graphql",
@@ -161,7 +162,7 @@ class WeddingApp {
     });
 
     // Health check
-    this.app.get("/health", (_req, res) => {
+    this.app.get("/health", (_req: Request, res: Response) => {
       res.json({
         status: "OK",
         timestamp: new Date().toISOString(),
@@ -179,7 +180,7 @@ class WeddingApp {
     });
 
     // API info
-    this.app.get("/", (_req, res) => {
+    this.app.get("/", (_req: Request, res: Response) => {
       res.json({
         name: "Wedding Management API",
         version: "1.0.0",
@@ -210,7 +211,7 @@ class WeddingApp {
       });
     });
 
-    this.app.get("/test", (_req, res) => {
+    this.app.get("/test", (_req: Request, res: Response) => {
       const testHtmlPath = path.join(
         __dirname,
         "./templates/graphql-quick-start-interface.html"
@@ -228,7 +229,7 @@ class WeddingApp {
     });
 
     // 404 handler
-    this.app.use((req, res) => {
+    this.app.use((req: Request, res: Response) => {
       res.status(404).json({
         error: "Not Found",
         message: `Cannot ${req.method} ${req.originalUrl}`,
@@ -261,20 +262,14 @@ class WeddingApp {
       }
       await mongoose.connect(mongoURI);
       console.log("✅ MongoDB connected successfully");
-
-      const connection = mongoose.connection;
     } catch (error) {
       console.error("❌ MongoDB connection error:", error);
-      process.exit(1);
+      throw error;
     }
   }
 
   public async start(): Promise<void> {
-    this.initializeMiddleware();
-    await this.initializeDatabase();
-    await this.initializeGraphQL();
-    this.initializeRoutes();
-
+    await this.initPromise;
     this.httpServer.listen(this.port, () => {
       console.log("\n" + "=".repeat(60));
       console.log("🎉 WEDDING MANAGEMENT API STARTED SUCCESSFULLY");
@@ -293,9 +288,22 @@ class WeddingApp {
       console.log(`🌐 Environment: ${process.env.NODE_ENV || "development"}`);
     });
   }
+
+  // Handler cho Vercel (serverless)
+  public handler = (req: Request, res: Response) => {
+    this.initPromise!.then(() => {
+      this.app(req, res);
+    }).catch((err) => {
+      console.error("Initialization error:", err);
+      res.status(500).send("Server initialization error");
+    });
+  };
 }
 
 const weddingApp = new WeddingApp();
-weddingApp.start().catch(console.error);
 
-export default weddingApp;
+if (process.env.NODE_ENV !== "production" || !process.env.VERCEL) {
+  weddingApp.start().catch(console.error);
+}
+
+export default weddingApp.handler;
