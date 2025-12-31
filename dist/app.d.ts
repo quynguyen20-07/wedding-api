@@ -1,14 +1,4 @@
-declare class WeddingApp {
-    private app;
-    private port;
-    private httpServer;
-    constructor();
-    private initializeMiddleware;
-    private initializeGraphQL;
-    private initializeRoutes;
-    private initializeDatabase;
-    start(): Promise<void>;
-}
-declare const weddingApp: WeddingApp;
-export default weddingApp;
+import { Request, Response } from "express";
+declare const _default: (req: Request, res: Response) => void;
+export default _default;
 //# sourceMappingURL=app.d.ts.map

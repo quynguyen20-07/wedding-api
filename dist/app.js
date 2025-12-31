@@ -3,13 +3,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
 const graphql_playground_html_1 = require("graphql-playground-html");
 const apollo_server_express_1 = require("apollo-server-express");
 const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
 const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
 const fs_1 = require("fs");
 const mongoose_1 = __importDefault(require("mongoose"));
-const express_1 = __importDefault(require("express"));
 const helmet_1 = __importDefault(require("helmet"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const path_1 = __importDefault(require("path"));
@@ -20,12 +20,23 @@ const swagger_json_1 = __importDefault(require("./swagger.json"));
 dotenv_1.default.config();
 class WeddingApp {
     constructor() {
+        this.initPromise = null;
+        // Handler cho Vercel (serverless)
+        this.handler = (req, res) => {
+            this.initPromise.then(() => {
+                this.app(req, res);
+            }).catch((err) => {
+                console.error("Initialization error:", err);
+                res.status(500).send("Server initialization error");
+            });
+        };
         this.app = (0, express_1.default)();
         this.port = parseInt(process.env.PORT || "5000");
         this.httpServer = http_1.default.createServer(this.app);
+        this.initializeMiddleware();
+        this.initPromise = this.initializeAsync();
     }
     initializeMiddleware() {
-        // Cấu hình Helmet với CSP cho phép GraphQL Playground
         this.app.use((0, helmet_1.default)({
             contentSecurityPolicy: {
                 directives: {
@@ -38,11 +49,7 @@ class WeddingApp {
                         "https://cdn.jsdelivr.net",
                     ],
                     imgSrc: ["'self'", "data:", "https://cdn.jsdelivr.net"],
-                    connectSrc: [
-                        "'self'",
-                        "https://cdn.jsdelivr.net",
-                        "ws://localhost:" + this.port,
-                    ],
+                    connectSrc: ["'self'", "https://cdn.jsdelivr.net", "ws:"],
                     fontSrc: ["'self'", "https://cdn.jsdelivr.net"],
                 },
             },
@@ -61,6 +68,11 @@ class WeddingApp {
         this.app.use(express_1.default.urlencoded({ extended: true }));
         // Static files
         this.app.use("/uploads", express_1.default.static("uploads"));
+    }
+    async initializeAsync() {
+        await this.initializeDatabase();
+        await this.initializeGraphQL();
+        this.initializeRoutes();
     }
     async initializeGraphQL() {
         try {
@@ -92,6 +104,7 @@ class WeddingApp {
         }
         catch (error) {
             console.error("❌ GraphQL initialization error:", error);
+            throw error;
         }
     }
     initializeRoutes() {
@@ -221,18 +234,14 @@ class WeddingApp {
             }
             await mongoose_1.default.connect(mongoURI);
             console.log("✅ MongoDB connected successfully");
-            const connection = mongoose_1.default.connection;
         }
         catch (error) {
             console.error("❌ MongoDB connection error:", error);
-            process.exit(1);
+            throw error;
         }
     }
     async start() {
-        this.initializeMiddleware();
-        await this.initializeDatabase();
-        await this.initializeGraphQL();
-        this.initializeRoutes();
+        await this.initPromise;
         this.httpServer.listen(this.port, () => {
             console.log("\n" + "=".repeat(60));
             console.log("🎉 WEDDING MANAGEMENT API STARTED SUCCESSFULLY");
@@ -249,6 +258,8 @@ class WeddingApp {
     }
 }
 const weddingApp = new WeddingApp();
-weddingApp.start().catch(console.error);
-exports.default = weddingApp;
+if (process.env.NODE_ENV !== "production" || !process.env.VERCEL) {
+    weddingApp.start().catch(console.error);
+}
+exports.default = weddingApp.handler;
 //# sourceMappingURL=app.js.map

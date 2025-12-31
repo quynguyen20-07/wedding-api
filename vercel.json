@@ -2,15 +2,24 @@
   "version": 2,
   "buildCommand": "yarn build",
   "outputDirectory": "dist",
-  "functions": {
-    "api/**/*.ts": {
-      "maxDuration": 30
-    }
-  },
-  "rewrites": [
+  "builds": [
     {
-      "source": "/(.*)",
-      "destination": "/api/app"
+      "src": "dist/app.js",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": [
+          "graphql/**",
+          "swagger.json",
+          "templates/**",
+          "uploads/**"
+        ]
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "dist/app.js"
     }
   ],
   "headers": [
