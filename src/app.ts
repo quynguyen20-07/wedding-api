@@ -85,12 +85,29 @@ class WeddingApp {
         "utf-8"
       );
 
+      // const server = new ApolloServer({
+      //   typeDefs,
+      //   resolvers,
+      //   context: ({ req }: { req: Request }) => {
+      //     const token = req.headers.authorization?.replace("Bearer ", "") || "";
+      //     return { token, req };
+      //   },
+      //   formatError: (error) => {
+      //     console.error("GraphQL Error:", error.message);
+      //     return {
+      //       message: error.message,
+      //       code: error.extensions?.code || "INTERNAL_SERVER_ERROR",
+      //     };
+      //   },
+      //   introspection: true,
+      //   cache: process.env.NODE_ENV === "production" ? "bounded" : undefined,
+      // });
+
       const server = new ApolloServer({
         typeDefs,
         resolvers,
         context: ({ req }: { req: Request }) => {
-          const token = req.headers.authorization?.replace("Bearer ", "") || "";
-          return { token, req };
+          return { req };
         },
         formatError: (error) => {
           console.error("GraphQL Error:", error.message);
