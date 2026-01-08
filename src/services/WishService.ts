@@ -1,3 +1,4 @@
+import HttpStatus from "http-status";
 import { Types } from "mongoose";
 
 import { WeddingRepository } from "../repositories/WeddingRepository";
@@ -60,7 +61,7 @@ export class WishService {
   async approveWish(id: string, userId: string): Promise<IWish | null> {
     const wish = await Wish.findById(id);
     if (!wish) {
-      throw new AppError("Wish not found", 404);
+      throw new AppError("Wish not found", HttpStatus.NOT_FOUND);
     }
 
     // Verify wedding ownership
@@ -68,7 +69,7 @@ export class WishService {
       wish.weddingId.toString()
     );
     if (!wedding || wedding.userId.toString() !== userId) {
-      throw new AppError("Unauthorized", 403);
+      throw new AppError("Unauthorized", HttpStatus.FORBIDDEN);
     }
 
     const approvedWish = await Wish.findByIdAndUpdate(
@@ -91,7 +92,7 @@ export class WishService {
       wish.weddingId.toString()
     );
     if (!wedding || wedding.userId.toString() !== userId) {
-      throw new AppError("Unauthorized", 403);
+      throw new AppError("Unauthorized", HttpStatus.FORBIDDEN);
     }
 
     const deletedWish = await Wish.findByIdAndUpdate(
@@ -110,7 +111,7 @@ export class WishService {
     // Verify wedding ownership
     const wedding = await this.weddingRepository.findById(weddingId);
     if (!wedding || wedding.userId.toString() !== userId) {
-      throw new AppError("Unauthorized", 403);
+      throw new AppError("Unauthorized", HttpStatus.FORBIDDEN);
     }
 
     const [total, approved] = await Promise.all([

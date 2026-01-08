@@ -1,3 +1,5 @@
+import HttpStatus from "http-status";
+
 import { WeddingRepository } from "../repositories/WeddingRepository";
 import { WeddingDetail } from "../models/WeddingDetail";
 import { AppError } from "../utils/AppError";
@@ -14,7 +16,7 @@ export class WeddingDetailService {
       // Verify wedding ownership
       const wedding = await this.weddingRepository.findById(weddingId);
       if (!wedding || wedding.userId.toString() !== userId) {
-        throw new AppError("Unauthorized", 403);
+        throw new AppError("Unauthorized", HttpStatus.FORBIDDEN);
       }
     }
 
@@ -29,7 +31,7 @@ export class WeddingDetailService {
   async updateBride(weddingId: string, userId: string, brideData: any) {
     const wedding = await this.weddingRepository.findById(weddingId);
     if (!wedding || wedding.userId.toString() !== userId) {
-      throw new AppError("Unauthorized", 403);
+      throw new AppError("Unauthorized", HttpStatus.FORBIDDEN);
     }
 
     const weddingDetail = await WeddingDetail.findOneAndUpdate(
@@ -44,7 +46,7 @@ export class WeddingDetailService {
   async updateGroom(weddingId: string, userId: string, groomData: any) {
     const wedding = await this.weddingRepository.findById(weddingId);
     if (!wedding || wedding.userId.toString() !== userId) {
-      throw new AppError("Unauthorized", 403);
+      throw new AppError("Unauthorized", HttpStatus.FORBIDDEN);
     }
 
     const weddingDetail = await WeddingDetail.findOneAndUpdate(
@@ -59,7 +61,7 @@ export class WeddingDetailService {
   async addLoveStory(weddingId: string, userId: string, storyData: any) {
     const wedding = await this.weddingRepository.findById(weddingId);
     if (!wedding || wedding.userId.toString() !== userId) {
-      throw new AppError("Unauthorized", 403);
+      throw new AppError("Unauthorized", HttpStatus.FORBIDDEN);
     }
 
     const weddingDetail = await WeddingDetail.findOneAndUpdate(
@@ -74,7 +76,7 @@ export class WeddingDetailService {
   async addWeddingEvent(weddingId: string, userId: string, eventData: any) {
     const wedding = await this.weddingRepository.findById(weddingId);
     if (!wedding || wedding.userId.toString() !== userId) {
-      throw new AppError("Unauthorized", 403);
+      throw new AppError("Unauthorized", HttpStatus.FORBIDDEN);
     }
 
     const weddingDetail = await WeddingDetail.findOneAndUpdate(

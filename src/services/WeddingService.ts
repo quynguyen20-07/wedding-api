@@ -1,3 +1,4 @@
+import HttpStatus from "http-status";
 import { Types } from "mongoose";
 
 import { WeddingRepository } from "../repositories/WeddingRepository";
@@ -6,6 +7,7 @@ import { WeddingDetail } from "../models/WeddingDetail";
 import { generateSlug } from "../utils/helpers";
 import { IWedding } from "../models/Wedding";
 import { AppError } from "../utils/AppError";
+import { IUser } from "../models/User";
 
 export class WeddingService {
   private weddingRepository: WeddingRepository;
@@ -14,10 +16,7 @@ export class WeddingService {
     this.weddingRepository = new WeddingRepository();
   }
 
-  async createWedding(
-    userId: string,
-    data: CreateWeddingData
-  ): Promise<IWedding> {
+  async createWedding(user: IUser, data: CreateWeddingData): Promise<IWedding> {
     const slug = data.slug || generateSlug(data.title);
 
     // Check if slug exists
@@ -57,11 +56,11 @@ export class WeddingService {
 
     // Create wedding
     const wedding = await this.weddingRepository.create({
-      userId: new Types.ObjectId(userId),
+      userId: new Types.ObjectId(user?._id.toString()),
       title: data.title,
       slug,
       weddingDate:
-        data.weddingDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // Default: 30 days from now
+        data.weddingDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
       language: data.language || "vi",
       themeSettings,
     });
@@ -99,23 +98,26 @@ export class WeddingService {
     return wedding;
   }
 
-  async getUserWeddings(userId: string): Promise<IWedding[]> {
-    return this.weddingRepository.findByUserId(userId);
+  async getUserWeddings(user?: IUser): Promise<IWedding[]> {
+    return this.weddingRepository.findByUserId(user?._id.toString());
   }
 
   async getWeddings(): Promise<IWedding[]> {
     return this.weddingRepository.findList();
   }
 
-  async getWeddingById(id: string, userId?: string): Promise<IWedding | null> {
+  async getWeddingById(id: string, user?: IUser): Promise<IWedding | null> {
     const wedding = await this.weddingRepository.findById(id);
 
     if (!wedding || !wedding.isActive) {
-      throw new AppError("Wedding not found", 404);
+      throw new AppError("Wedding not found", HttpStatus.NOT_FOUND);
     }
 
-    if (userId && wedding.userId.toString() !== userId) {
-      throw new AppError("Unauthorized", 403);
+    if (
+      user?.role !== "admin" &&
+      wedding.userId.toString() !== user?._id.toString()
+    ) {
+      throw new AppError("Unauthorized", HttpStatus.FORBIDDEN);
     }
 
     return wedding;
@@ -135,10 +137,10 @@ export class WeddingService {
 
   async updateWedding(
     id: string,
-    userId: string,
+    user: IUser,
     data: UpdateWeddingData
   ): Promise<IWedding | null> {
-    await this.getWeddingById(id, userId);
+    await this.getWeddingById(id, user?._id.toString());
 
     // SỬA: Chỉ update những field được cung cấp
     const updateData: any = {};
@@ -159,18 +161,18 @@ export class WeddingService {
     return this.weddingRepository.update(id, updateData);
   }
 
-  async deleteWedding(id: string, userId: string): Promise<IWedding | null> {
-    await this.getWeddingById(id, userId);
+  async deleteWedding(id: string, user?: IUser): Promise<IWedding | null> {
+    await this.getWeddingById(id, user?._id.toString());
     return this.weddingRepository.delete(id);
   }
 
-  async publishWedding(id: string, userId: string): Promise<IWedding | null> {
-    await this.getWeddingById(id, userId);
+  async publishWedding(id: string, user?: IUser): Promise<IWedding | null> {
+    await this.getWeddingById(id, user?._id.toString());
     return this.weddingRepository.publishWedding(id);
   }
 
-  async unpublishWedding(id: string, userId: string): Promise<IWedding | null> {
-    await this.getWeddingById(id, userId);
+  async unpublishWedding(id: string, user?: IUser): Promise<IWedding | null> {
+    await this.getWeddingById(id, user?._id.toString());
     return this.weddingRepository.unpublishWedding(id);
   }
 

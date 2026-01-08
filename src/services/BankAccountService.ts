@@ -1,3 +1,4 @@
+import HttpStatus from "http-status";
 import { Types } from "mongoose";
 
 import { WeddingRepository } from "../repositories/WeddingRepository";
@@ -27,7 +28,7 @@ export class BankAccountService {
     // Verify wedding ownership
     const wedding = await this.weddingRepository.findById(weddingId);
     if (!wedding || wedding.userId.toString() !== userId) {
-      throw new AppError("Unauthorized", 403);
+      throw new AppError("Unauthorized", HttpStatus.FORBIDDEN);
     }
 
     const bankAccount = await BankAccount.create({
@@ -45,7 +46,7 @@ export class BankAccountService {
     // Verify wedding ownership
     const wedding = await this.weddingRepository.findById(weddingId);
     if (!wedding || wedding.userId.toString() !== userId) {
-      throw new AppError("Unauthorized", 403);
+      throw new AppError("Unauthorized", HttpStatus.FORBIDDEN);
     }
 
     const bankAccounts = await BankAccount.find({
@@ -63,7 +64,7 @@ export class BankAccountService {
   ): Promise<IBankAccount | null> {
     const bankAccount = await BankAccount.findById(id);
     if (!bankAccount) {
-      throw new AppError("Bank account not found", 404);
+      throw new AppError("Bank account not found", HttpStatus.NOT_FOUND);
     }
 
     // Verify wedding ownership
@@ -71,7 +72,7 @@ export class BankAccountService {
       bankAccount.weddingId.toString()
     );
     if (!wedding || wedding.userId.toString() !== userId) {
-      throw new AppError("Unauthorized", 403);
+      throw new AppError("Unauthorized", HttpStatus.FORBIDDEN);
     }
 
     const updatedBankAccount = await BankAccount.findByIdAndUpdate(
@@ -89,7 +90,7 @@ export class BankAccountService {
   ): Promise<IBankAccount | null> {
     const bankAccount = await BankAccount.findById(id);
     if (!bankAccount) {
-      throw new AppError("Bank account not found", 404);
+      throw new AppError("Bank account not found", HttpStatus.NOT_FOUND);
     }
 
     // Verify wedding ownership
@@ -97,7 +98,7 @@ export class BankAccountService {
       bankAccount.weddingId.toString()
     );
     if (!wedding || wedding.userId.toString() !== userId) {
-      throw new AppError("Unauthorized", 403);
+      throw new AppError("Unauthorized", HttpStatus.FORBIDDEN);
     }
 
     const deletedBankAccount = await BankAccount.findByIdAndUpdate(
@@ -110,7 +111,6 @@ export class BankAccountService {
   }
 
   async generateQRCodeData(account: IBankAccount): Promise<string> {
-    // Generate QR code data for Vietnam bank transfer
     const qrData = {
       bank: account.bankName,
       account: account.accountNumber,

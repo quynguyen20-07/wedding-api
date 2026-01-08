@@ -3,6 +3,7 @@ import { renderPlaygroundPage } from "graphql-playground-html";
 import { ApolloServer } from "apollo-server-express";
 import swaggerUi from "swagger-ui-express";
 import rateLimit from "express-rate-limit";
+import { GraphQLError } from "graphql";
 import { readFileSync } from "fs";
 import mongoose from "mongoose";
 import helmet from "helmet";
@@ -85,36 +86,23 @@ class WeddingApp {
         "utf-8"
       );
 
-      // const server = new ApolloServer({
-      //   typeDefs,
-      //   resolvers,
-      //   context: ({ req }: { req: Request }) => {
-      //     const token = req.headers.authorization?.replace("Bearer ", "") || "";
-      //     return { token, req };
-      //   },
-      //   formatError: (error) => {
-      //     console.error("GraphQL Error:", error.message);
-      //     return {
-      //       message: error.message,
-      //       code: error.extensions?.code || "INTERNAL_SERVER_ERROR",
-      //     };
-      //   },
-      //   introspection: true,
-      //   cache: process.env.NODE_ENV === "production" ? "bounded" : undefined,
-      // });
-
       const server = new ApolloServer({
         typeDefs,
         resolvers,
         context: ({ req }: { req: Request }) => {
-          return { req };
+          const token = req.headers.authorization?.replace("Bearer ", "") || "";
+          return { token, req };
         },
-        formatError: (error) => {
-          console.error("GraphQL Error:", error.message);
-          return {
+        formatError: (error: any) => {
+          const statusCode = error.extensions.exception?.statusCode;
+          const err = {
             message: error.message,
-            code: error.extensions?.code || "INTERNAL_SERVER_ERROR",
+            code: statusCode,
           };
+
+          console.error("GraphQL Error:", err);
+
+          return err;
         },
         introspection: true,
         cache: process.env.NODE_ENV === "production" ? "bounded" : undefined,

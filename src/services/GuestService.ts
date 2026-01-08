@@ -1,3 +1,5 @@
+import HttpStatus from "http-status";
+
 import { WeddingRepository } from "../repositories/WeddingRepository";
 import { GuestRepository } from "../repositories/GuestRepository";
 import { GuestStats, RSVPInput } from "../types";
@@ -16,7 +18,7 @@ export class GuestService {
     // Check if wedding exists and is published
     const wedding = await this.weddingRepository.findById(weddingId);
     if (!wedding || wedding.status !== "published") {
-      throw new AppError("Wedding not found", 404);
+      throw new AppError("Wedding not found", HttpStatus.NOT_FOUND);
     }
 
     const guest = await this.guestRepository.create({
@@ -32,7 +34,7 @@ export class GuestService {
     // Verify wedding ownership
     const wedding = await this.weddingRepository.findById(weddingId);
     if (!wedding || wedding.userId.toString() !== userId) {
-      throw new AppError("Unauthorized", 403);
+      throw new AppError("Unauthorized", HttpStatus.FORBIDDEN);
     }
 
     return this.guestRepository.findByWeddingId(weddingId);
@@ -42,7 +44,7 @@ export class GuestService {
     // Verify wedding ownership
     const wedding = await this.weddingRepository.findById(weddingId);
     if (!wedding || wedding.userId.toString() !== userId) {
-      throw new AppError("Unauthorized", 403);
+      throw new AppError("Unauthorized", HttpStatus.FORBIDDEN);
     }
 
     const guests = await this.guestRepository.findByWeddingId(weddingId);

@@ -7,6 +7,7 @@ import {
   WishService,
 } from "../services";
 import { authenticateGraphQL } from "../middleware/auth";
+import { IUser } from "../models/User";
 
 export const resolvers = {
   Query: {
@@ -18,7 +19,7 @@ export const resolvers = {
 
     // Weddings
     userWeddings: async (_: any, __: any, context: any) => {
-      const user = await authenticateGraphQL(context);
+      const user: IUser = await authenticateGraphQL(context);
       const weddingService = new WeddingService();
       return weddingService.getUserWeddings(user._id.toString());
     },
@@ -31,7 +32,7 @@ export const resolvers = {
     wedding: async (_: any, { id }: { id: string }, context: any) => {
       const user = await authenticateGraphQL(context);
       const weddingService = new WeddingService();
-      return weddingService.getWeddingById(id, user._id.toString());
+      return weddingService.getWeddingById(id, user);
     },
 
     weddingBySlug: async (_: any, { slug }: { slug: string }, context: any) => {
