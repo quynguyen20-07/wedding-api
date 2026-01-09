@@ -123,7 +123,10 @@ export class WeddingService {
     return wedding;
   }
 
-  async getWeddingBySlug(slug: string, user?: IUser): Promise<IWedding | null> {
+  async getWeddingBySlug(
+    slug: string,
+    user?: IUser | null
+  ): Promise<IWedding | null> {
     let isActive: boolean | undefined = undefined;
     if (user?.role !== "admin") {
       isActive = true;

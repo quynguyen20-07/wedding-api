@@ -51,6 +51,23 @@ export const authenticateGraphQL = async (context: any) => {
   return user;
 };
 
+export const authOptionalFriendlyGraphQL = async (context: any) => {
+  const { token } = context;
+
+  if (!token) return null;
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
+
+    const user = await User.findById(decoded.userId);
+    if (!user || !user.isActive) return null;
+
+    return user;
+  } catch {
+    return null;
+  }
+};
+
 export const authorize = (...roles: string[]) => {
   return (req: AuthRequest, _res: Response, next: NextFunction) => {
     if (!req.user) {

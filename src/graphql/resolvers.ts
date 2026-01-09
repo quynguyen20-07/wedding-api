@@ -6,7 +6,10 @@ import {
   WeddingService,
   WishService,
 } from "../services";
-import { authenticateGraphQL } from "../middleware/auth";
+import {
+  authenticateGraphQL,
+  authOptionalFriendlyGraphQL,
+} from "../middleware/auth";
 import { IUser } from "../models/User";
 
 export const resolvers = {
@@ -38,7 +41,7 @@ export const resolvers = {
     weddingBySlug: async (_: any, { slug }: { slug: string }, context: any) => {
       let user;
       if (context.token) {
-        user = await authenticateGraphQL(context);
+        user = await authOptionalFriendlyGraphQL(context);
       }
 
       const weddingService = new WeddingService();
