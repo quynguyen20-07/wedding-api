@@ -39,11 +39,7 @@ export const resolvers = {
     },
 
     weddingBySlug: async (_: any, { slug }: { slug: string }, context: any) => {
-      let user;
-      if (context.token) {
-        user = await authOptionalFriendlyGraphQL(context);
-      }
-
+      const user = await authOptionalFriendlyGraphQL(context);
       const weddingService = new WeddingService();
       return weddingService.getWeddingBySlug(slug, user);
     },
