@@ -117,6 +117,7 @@ type ThemeSettings {
   secondaryColor: String!
   fontHeading: String!
   fontBody: String!
+  template: String!
   backgroundMusic: String
 }
 

@@ -11,6 +11,7 @@ export interface IWedding extends Document {
         secondaryColor: string;
         fontHeading: string;
         fontBody: string;
+        template: string;
         backgroundMusic?: string;
     };
     viewCount: number;

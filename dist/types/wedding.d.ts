@@ -73,6 +73,7 @@ export interface CreateWeddingData {
         primaryColor?: string;
         secondaryColor?: string;
         fontHeading?: string;
+        template?: string;
         fontBody?: string;
         backgroundMusic?: string;
     };

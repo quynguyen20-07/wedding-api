@@ -40,6 +40,10 @@ const WeddingSchema = new mongoose_1.Schema({
             type: String,
             default: "#F7E7CE",
         },
+        template: {
+            type: String,
+            default: "blush-romance",
+        },
         secondaryColor: {
             type: String,
             default: "#F4B6C2",
