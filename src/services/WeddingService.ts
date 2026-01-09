@@ -123,10 +123,15 @@ export class WeddingService {
     return wedding;
   }
 
-  async getWeddingBySlug(slug: string): Promise<IWedding | null> {
-    const wedding = await this.weddingRepository.findBySlug(slug);
+  async getWeddingBySlug(slug: string, user?: IUser): Promise<IWedding | null> {
+    let isActive: boolean | undefined = undefined;
+    if (user?.role !== "admin") {
+      isActive = true;
+    }
 
-    if (!wedding || !wedding.isActive || wedding.status !== "published") {
+    const wedding = await this.weddingRepository.findBySlug(slug, isActive);
+
+    if (!wedding) {
       throw new AppError("Wedding not found", 404);
     }
 

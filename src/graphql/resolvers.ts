@@ -38,7 +38,7 @@ export const resolvers = {
     weddingBySlug: async (_: any, { slug }: { slug: string }, context: any) => {
       const user = await authenticateGraphQL(context);
       const weddingService = new WeddingService();
-      return weddingService.getWeddingBySlug(slug);
+      return weddingService.getWeddingBySlug(slug, user);
     },
 
     searchWeddings: async (

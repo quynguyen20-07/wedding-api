@@ -14,8 +14,14 @@ export class WeddingRepository extends BaseRepository<IWedding> {
     return this.findAll();
   }
 
-  async findBySlug(slug: string): Promise<IWedding | null> {
-    return this.findOne({ slug, isActive: true });
+  async findBySlug(slug: string, isActive?: boolean): Promise<IWedding | null> {
+    const query: Record<string, unknown> = { slug };
+
+    if (isActive) {
+      query.isActive = isActive;
+    }
+
+    return this.findOne(query);
   }
 
   async incrementViewCount(slug: string): Promise<IWedding | null> {
