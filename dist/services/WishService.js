@@ -1,6 +1,10 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WishService = void 0;
+const http_status_1 = __importDefault(require("http-status"));
 const mongoose_1 = require("mongoose");
 const WeddingRepository_1 = require("../repositories/WeddingRepository");
 const Wish_1 = require("../models/Wish");
@@ -41,12 +45,12 @@ class WishService {
     async approveWish(id, userId) {
         const wish = await Wish_1.Wish.findById(id);
         if (!wish) {
-            throw new AppError_1.AppError("Wish not found", 404);
+            throw new AppError_1.AppError("Wish not found", http_status_1.default.NOT_FOUND);
         }
         // Verify wedding ownership
         const wedding = await this.weddingRepository.findById(wish.weddingId.toString());
         if (!wedding || wedding.userId.toString() !== userId) {
-            throw new AppError_1.AppError("Unauthorized", 403);
+            throw new AppError_1.AppError("Unauthorized", http_status_1.default.FORBIDDEN);
         }
         const approvedWish = await Wish_1.Wish.findByIdAndUpdate(id, { isApproved: true }, { new: true });
         return approvedWish;
@@ -59,7 +63,7 @@ class WishService {
         // Verify wedding ownership
         const wedding = await this.weddingRepository.findById(wish.weddingId.toString());
         if (!wedding || wedding.userId.toString() !== userId) {
-            throw new AppError_1.AppError("Unauthorized", 403);
+            throw new AppError_1.AppError("Unauthorized", http_status_1.default.FORBIDDEN);
         }
         const deletedWish = await Wish_1.Wish.findByIdAndUpdate(id, { isActive: false }, { new: true });
         return deletedWish;
@@ -68,7 +72,7 @@ class WishService {
         // Verify wedding ownership
         const wedding = await this.weddingRepository.findById(weddingId);
         if (!wedding || wedding.userId.toString() !== userId) {
-            throw new AppError_1.AppError("Unauthorized", 403);
+            throw new AppError_1.AppError("Unauthorized", http_status_1.default.FORBIDDEN);
         }
         const [total, approved] = await Promise.all([
             Wish_1.Wish.countDocuments({ weddingId, isActive: true }),

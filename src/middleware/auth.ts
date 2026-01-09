@@ -16,12 +16,20 @@ export interface AuthRequest extends Request {
 const verifyTokenAndGetUser = async (token?: string) => {
   if (!token) return null;
 
-  const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
+  const cleanToken = token.startsWith("Bearer ")
+    ? token.replace("Bearer ", "").trim()
+    : token;
 
-  const user = await User.findById(decoded.userId);
-  if (!user || !user.isActive) return null;
+  try {
+    const decoded = jwt.verify(cleanToken, process.env.JWT_SECRET!) as any;
 
-  return user;
+    const user = await User.findById(decoded.userId);
+    if (!user || !user.isActive) return null;
+
+    return user;
+  } catch {
+    return null;
+  }
 };
 
 /**

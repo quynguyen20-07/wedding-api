@@ -85,11 +85,13 @@ class WeddingApp {
                     return { token, req };
                 },
                 formatError: (error) => {
-                    console.error("GraphQL Error:", error.message);
-                    return {
+                    const statusCode = error.extensions.exception?.statusCode;
+                    const err = {
                         message: error.message,
-                        code: error.extensions?.code || "INTERNAL_SERVER_ERROR",
+                        code: statusCode,
                     };
+                    console.error("GraphQL Error:", err);
+                    return err;
                 },
                 introspection: true,
                 cache: process.env.NODE_ENV === "production" ? "bounded" : undefined,

@@ -23,12 +23,12 @@ exports.resolvers = {
         wedding: async (_, { id }, context) => {
             const user = await (0, auth_1.authenticateGraphQL)(context);
             const weddingService = new services_1.WeddingService();
-            return weddingService.getWeddingById(id, user._id.toString());
+            return weddingService.getWeddingById(id, user);
         },
         weddingBySlug: async (_, { slug }, context) => {
-            const user = await (0, auth_1.authenticateGraphQL)(context);
+            const user = await (0, auth_1.authOptionalFriendlyGraphQL)(context);
             const weddingService = new services_1.WeddingService();
-            return weddingService.getWeddingBySlug(slug);
+            return weddingService.getWeddingBySlug(slug, user);
         },
         searchWeddings: async (_, { query }, context) => {
             const user = await (0, auth_1.authenticateGraphQL)(context);

@@ -1,6 +1,10 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WeddingService = void 0;
+const http_status_1 = __importDefault(require("http-status"));
 const mongoose_1 = require("mongoose");
 const WeddingRepository_1 = require("../repositories/WeddingRepository");
 const WeddingDetail_1 = require("../models/WeddingDetail");
@@ -10,7 +14,7 @@ class WeddingService {
     constructor() {
         this.weddingRepository = new WeddingRepository_1.WeddingRepository();
     }
-    async createWedding(userId, data) {
+    async createWedding(user, data) {
         const slug = data.slug || (0, helpers_1.generateSlug)(data.title);
         // Check if slug exists
         const existing = await this.weddingRepository.findBySlug(slug);
@@ -43,10 +47,10 @@ class WeddingService {
         };
         // Create wedding
         const wedding = await this.weddingRepository.create({
-            userId: new mongoose_1.Types.ObjectId(userId),
+            userId: new mongoose_1.Types.ObjectId(user?._id.toString()),
             title: data.title,
             slug,
-            weddingDate: data.weddingDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // Default: 30 days from now
+            weddingDate: data.weddingDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
             language: data.language || "vi",
             themeSettings,
         });
@@ -79,32 +83,37 @@ class WeddingService {
         }
         return wedding;
     }
-    async getUserWeddings(userId) {
-        return this.weddingRepository.findByUserId(userId);
+    async getUserWeddings(user) {
+        return this.weddingRepository.findByUserId(user?._id.toString());
     }
     async getWeddings() {
         return this.weddingRepository.findList();
     }
-    async getWeddingById(id, userId) {
+    async getWeddingById(id, user) {
         const wedding = await this.weddingRepository.findById(id);
         if (!wedding || !wedding.isActive) {
-            throw new AppError_1.AppError("Wedding not found", 404);
+            throw new AppError_1.AppError("Wedding not found", http_status_1.default.NOT_FOUND);
         }
-        if (userId && wedding.userId.toString() !== userId) {
-            throw new AppError_1.AppError("Unauthorized", 403);
+        if (user?.role !== "admin" &&
+            wedding.userId.toString() !== user?._id.toString()) {
+            throw new AppError_1.AppError("Unauthorized", http_status_1.default.FORBIDDEN);
         }
         return wedding;
     }
-    async getWeddingBySlug(slug) {
-        const wedding = await this.weddingRepository.findBySlug(slug);
-        if (!wedding || !wedding.isActive || wedding.status !== "published") {
+    async getWeddingBySlug(slug, user) {
+        let isActive = undefined;
+        if (user?.role !== "admin") {
+            isActive = true;
+        }
+        const wedding = await this.weddingRepository.findBySlug(slug, isActive);
+        if (!wedding) {
             throw new AppError_1.AppError("Wedding not found", 404);
         }
         await this.weddingRepository.incrementViewCount(slug);
         return wedding;
     }
-    async updateWedding(id, userId, data) {
-        await this.getWeddingById(id, userId);
+    async updateWedding(id, user, data) {
+        await this.getWeddingById(id, user?._id.toString());
         // SỬA: Chỉ update những field được cung cấp
         const updateData = {};
         if (data.title)
@@ -126,16 +135,16 @@ class WeddingService {
         }
         return this.weddingRepository.update(id, updateData);
     }
-    async deleteWedding(id, userId) {
-        await this.getWeddingById(id, userId);
+    async deleteWedding(id, user) {
+        await this.getWeddingById(id, user?._id.toString());
         return this.weddingRepository.delete(id);
     }
-    async publishWedding(id, userId) {
-        await this.getWeddingById(id, userId);
+    async publishWedding(id, user) {
+        await this.getWeddingById(id, user?._id.toString());
         return this.weddingRepository.publishWedding(id);
     }
-    async unpublishWedding(id, userId) {
-        await this.getWeddingById(id, userId);
+    async unpublishWedding(id, user) {
+        await this.getWeddingById(id, user?._id.toString());
         return this.weddingRepository.unpublishWedding(id);
     }
     async searchWeddings(query, userId) {

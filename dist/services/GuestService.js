@@ -1,6 +1,10 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GuestService = void 0;
+const http_status_1 = __importDefault(require("http-status"));
 const WeddingRepository_1 = require("../repositories/WeddingRepository");
 const GuestRepository_1 = require("../repositories/GuestRepository");
 const AppError_1 = require("../utils/AppError");
@@ -13,7 +17,7 @@ class GuestService {
         // Check if wedding exists and is published
         const wedding = await this.weddingRepository.findById(weddingId);
         if (!wedding || wedding.status !== "published") {
-            throw new AppError_1.AppError("Wedding not found", 404);
+            throw new AppError_1.AppError("Wedding not found", http_status_1.default.NOT_FOUND);
         }
         const guest = await this.guestRepository.create({
             weddingId: weddingId,
@@ -26,7 +30,7 @@ class GuestService {
         // Verify wedding ownership
         const wedding = await this.weddingRepository.findById(weddingId);
         if (!wedding || wedding.userId.toString() !== userId) {
-            throw new AppError_1.AppError("Unauthorized", 403);
+            throw new AppError_1.AppError("Unauthorized", http_status_1.default.FORBIDDEN);
         }
         return this.guestRepository.findByWeddingId(weddingId);
     }
@@ -34,7 +38,7 @@ class GuestService {
         // Verify wedding ownership
         const wedding = await this.weddingRepository.findById(weddingId);
         if (!wedding || wedding.userId.toString() !== userId) {
-            throw new AppError_1.AppError("Unauthorized", 403);
+            throw new AppError_1.AppError("Unauthorized", http_status_1.default.FORBIDDEN);
         }
         const guests = await this.guestRepository.findByWeddingId(weddingId);
         const stats = {

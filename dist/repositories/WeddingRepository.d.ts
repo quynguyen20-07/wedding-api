@@ -4,7 +4,7 @@ export declare class WeddingRepository extends BaseRepository<IWedding> {
     constructor();
     findByUserId(userId: string): Promise<IWedding[]>;
     findList(): Promise<IWedding[]>;
-    findBySlug(slug: string): Promise<IWedding | null>;
+    findBySlug(slug: string, isActive?: boolean): Promise<IWedding | null>;
     incrementViewCount(slug: string): Promise<IWedding | null>;
     publishWedding(id: string): Promise<IWedding | null>;
     unpublishWedding(id: string): Promise<IWedding | null>;

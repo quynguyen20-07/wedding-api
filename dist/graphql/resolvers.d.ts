@@ -1,6 +1,7 @@
+import { IUser } from "../models/User";
 export declare const resolvers: {
     Query: {
-        me: (_: any, __: any, context: any) => Promise<import("mongoose").Document<unknown, {}, import("..").IUser> & import("..").IUser & {
+        me: (_: any, __: any, context: any) => Promise<import("mongoose").Document<unknown, {}, IUser> & IUser & {
             _id: import("mongoose").Types.ObjectId;
         }>;
         userWeddings: (_: any, __: any, context: any) => Promise<import("..").IWedding[]>;
@@ -31,12 +32,12 @@ export declare const resolvers: {
     };
     Mutation: {
         register: (_: any, args: any) => Promise<{
-            user: import("..").IUser;
+            user: IUser;
             accessToken: string;
             refreshToken: string;
         }>;
         login: (_: any, args: any) => Promise<{
-            user: import("..").IUser;
+            user: IUser;
             accessToken: string;
             refreshToken: string;
         }>;

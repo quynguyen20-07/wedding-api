@@ -13,8 +13,12 @@ class WeddingRepository extends BaseRepository_1.BaseRepository {
     async findList() {
         return this.findAll();
     }
-    async findBySlug(slug) {
-        return this.findOne({ slug, isActive: true });
+    async findBySlug(slug, isActive) {
+        const query = { slug };
+        if (isActive) {
+            query.isActive = isActive;
+        }
+        return this.findOne(query);
     }
     async incrementViewCount(slug) {
         return this.model.findOneAndUpdate({ slug }, { $inc: { viewCount: 1 } }, { new: true });

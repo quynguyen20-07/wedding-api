@@ -1,6 +1,10 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BankAccountService = void 0;
+const http_status_1 = __importDefault(require("http-status"));
 const mongoose_1 = require("mongoose");
 const WeddingRepository_1 = require("../repositories/WeddingRepository");
 const BankAccount_1 = require("../models/BankAccount");
@@ -13,7 +17,7 @@ class BankAccountService {
         // Verify wedding ownership
         const wedding = await this.weddingRepository.findById(weddingId);
         if (!wedding || wedding.userId.toString() !== userId) {
-            throw new AppError_1.AppError("Unauthorized", 403);
+            throw new AppError_1.AppError("Unauthorized", http_status_1.default.FORBIDDEN);
         }
         const bankAccount = await BankAccount_1.BankAccount.create({
             weddingId: new mongoose_1.Types.ObjectId(weddingId),
@@ -25,7 +29,7 @@ class BankAccountService {
         // Verify wedding ownership
         const wedding = await this.weddingRepository.findById(weddingId);
         if (!wedding || wedding.userId.toString() !== userId) {
-            throw new AppError_1.AppError("Unauthorized", 403);
+            throw new AppError_1.AppError("Unauthorized", http_status_1.default.FORBIDDEN);
         }
         const bankAccounts = await BankAccount_1.BankAccount.find({
             weddingId,
@@ -36,12 +40,12 @@ class BankAccountService {
     async updateBankAccount(id, userId, data) {
         const bankAccount = await BankAccount_1.BankAccount.findById(id);
         if (!bankAccount) {
-            throw new AppError_1.AppError("Bank account not found", 404);
+            throw new AppError_1.AppError("Bank account not found", http_status_1.default.NOT_FOUND);
         }
         // Verify wedding ownership
         const wedding = await this.weddingRepository.findById(bankAccount.weddingId.toString());
         if (!wedding || wedding.userId.toString() !== userId) {
-            throw new AppError_1.AppError("Unauthorized", 403);
+            throw new AppError_1.AppError("Unauthorized", http_status_1.default.FORBIDDEN);
         }
         const updatedBankAccount = await BankAccount_1.BankAccount.findByIdAndUpdate(id, { $set: data }, { new: true });
         return updatedBankAccount;
@@ -49,18 +53,17 @@ class BankAccountService {
     async deleteBankAccount(id, userId) {
         const bankAccount = await BankAccount_1.BankAccount.findById(id);
         if (!bankAccount) {
-            throw new AppError_1.AppError("Bank account not found", 404);
+            throw new AppError_1.AppError("Bank account not found", http_status_1.default.NOT_FOUND);
         }
         // Verify wedding ownership
         const wedding = await this.weddingRepository.findById(bankAccount.weddingId.toString());
         if (!wedding || wedding.userId.toString() !== userId) {
-            throw new AppError_1.AppError("Unauthorized", 403);
+            throw new AppError_1.AppError("Unauthorized", http_status_1.default.FORBIDDEN);
         }
         const deletedBankAccount = await BankAccount_1.BankAccount.findByIdAndUpdate(id, { isActive: false }, { new: true });
         return deletedBankAccount;
     }
     async generateQRCodeData(account) {
-        // Generate QR code data for Vietnam bank transfer
         const qrData = {
             bank: account.bankName,
             account: account.accountNumber,
