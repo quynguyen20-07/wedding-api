@@ -12,6 +12,7 @@ export interface IWedding extends Document {
     secondaryColor: string;
     fontHeading: string;
     fontBody: string;
+    template: string;
     backgroundMusic?: string;
   };
   viewCount: number;
@@ -57,6 +58,10 @@ const WeddingSchema = new Schema<IWedding>(
       primaryColor: {
         type: String,
         default: "#F7E7CE",
+      },
+      template: {
+        type: String,
+        default: "blush-romance",
       },
       secondaryColor: {
         type: String,

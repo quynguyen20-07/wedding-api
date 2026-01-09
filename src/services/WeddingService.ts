@@ -31,6 +31,7 @@ export class WeddingService {
       secondaryColor: data.themeSettings?.secondaryColor || "#F4B6C2",
       fontHeading: data.themeSettings?.fontHeading || "Playfair Display",
       fontBody: data.themeSettings?.fontBody || "Inter",
+      template: data.themeSettings?.template || "blush-romance",
       backgroundMusic: data.themeSettings?.backgroundMusic,
     };
 
