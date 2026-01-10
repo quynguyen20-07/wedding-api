@@ -2,12 +2,11 @@ import winston from "winston";
 
 const isProd = process.env.NODE_ENV === "production";
 
-// Helper để tạo logger mà không trigger File constructor ở prod
 const createLogger = () => {
   const transports: winston.transport[] = [
     new winston.transports.Console({
       format: isProd
-        ? winston.format.combine(winston.format.json()) // JSON structured cho Vercel Logs
+        ? winston.format.combine(winston.format.json())
         : winston.format.combine(
             winston.format.colorize(),
             winston.format.simple()
@@ -15,9 +14,7 @@ const createLogger = () => {
     }),
   ];
 
-  // Chỉ thêm File transports nếu KHÔNG phải production (local dev)
   if (!isProd) {
-    // Import và định nghĩa File ở đây để tránh constructor chạy ở prod
     const { File } = winston.transports;
 
     transports.push(
