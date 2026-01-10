@@ -10,6 +10,7 @@ const WeddingRepository_1 = require("../repositories/WeddingRepository");
 const WeddingDetail_1 = require("../models/WeddingDetail");
 const helpers_1 = require("../utils/helpers");
 const AppError_1 = require("../utils/AppError");
+const logger_1 = __importDefault(require("../utils/logger"));
 class WeddingService {
     constructor() {
         this.weddingRepository = new WeddingRepository_1.WeddingRepository();
@@ -113,25 +114,25 @@ class WeddingService {
         await this.weddingRepository.incrementViewCount(slug);
         return wedding;
     }
-    async updateWedding(id, user, data) {
-        await this.getWeddingById(id, user?._id.toString());
-        // SỬA: Chỉ update những field được cung cấp
+    async updateWedding(id, data) {
+        const wedding = await this.weddingRepository.findById(id);
+        if (!wedding) {
+            throw new AppError_1.AppError("Đám cưới không tồn tại", http_status_1.default.BAD_REQUEST);
+        }
+        logger_1.default.info("wedding", {
+            wedding,
+        });
         const updateData = {};
-        if (data.title)
+        if (data.title !== undefined)
             updateData.title = data.title;
-        if (data.slug)
-            updateData.slug = data.slug;
-        if (data.language)
+        if (data.language !== undefined)
             updateData.language = data.language;
-        if (data.status)
+        if (data.status !== undefined)
             updateData.status = data.status;
         if (data.themeSettings) {
             updateData.themeSettings = {
-                primaryColor: data.themeSettings.primaryColor,
-                secondaryColor: data.themeSettings.secondaryColor,
-                fontHeading: data.themeSettings.fontHeading,
-                fontBody: data.themeSettings.fontBody,
-                backgroundMusic: data.themeSettings.backgroundMusic,
+                ...wedding.themeSettings,
+                ...data.themeSettings,
             };
         }
         return this.weddingRepository.update(id, updateData);

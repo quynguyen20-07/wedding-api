@@ -139,60 +139,65 @@ export const resolvers = {
     createWedding: async (_: any, args: any, context: any) => {
       const user = await authenticateGraphQL(context);
       const weddingService = new WeddingService();
-      return weddingService.createWedding(user._id.toString(), args);
+      return weddingService.createWedding(user, args);
     },
 
     updateWedding: async (_: any, { id, ...data }: any, context: any) => {
       const user = await authenticateGraphQL(context);
       const weddingService = new WeddingService();
-      return weddingService.updateWedding(id, user._id.toString(), data);
+
+      return weddingService.updateWedding(id, data);
     },
 
     deleteWedding: async (_: any, { id }: { id: string }, context: any) => {
       const user = await authenticateGraphQL(context);
       const weddingService = new WeddingService();
-      return weddingService.deleteWedding(id, user._id.toString());
+      return weddingService.deleteWedding(id, user);
     },
 
     publishWedding: async (_: any, { id }: { id: string }, context: any) => {
       const user = await authenticateGraphQL(context);
       const weddingService = new WeddingService();
-      return weddingService.publishWedding(id, user._id.toString());
+      return weddingService.publishWedding(id, user);
     },
 
     unpublishWedding: async (_: any, { id }: { id: string }, context: any) => {
       const user = await authenticateGraphQL(context);
       const weddingService = new WeddingService();
-      return weddingService.unpublishWedding(id, user._id.toString());
+      return weddingService.unpublishWedding(id, user);
     },
 
     // Wedding Details
     updateBride: async (_: any, { weddingId, bride }: any, context: any) => {
       const user = await authenticateGraphQL(context);
       const weddingDetailService = new WeddingDetailService();
-      return weddingDetailService.updateBride(
-        weddingId,
-        user._id.toString(),
-        bride
-      );
+      return weddingDetailService.updateBride(weddingId, user, bride);
     },
 
     updateGroom: async (_: any, { weddingId, groom }: any, context: any) => {
       const user = await authenticateGraphQL(context);
       const weddingDetailService = new WeddingDetailService();
-      return weddingDetailService.updateGroom(
-        weddingId,
-        user._id.toString(),
-        groom
-      );
+      return weddingDetailService.updateGroom(weddingId, user, groom);
     },
 
     addLoveStory: async (_: any, { weddingId, story }: any, context: any) => {
       const user = await authenticateGraphQL(context);
       const weddingDetailService = new WeddingDetailService();
-      return weddingDetailService.addLoveStory(
+      return weddingDetailService.addLoveStory(weddingId, user, story);
+    },
+
+    updateLoveStory: async (
+      _: any,
+      { weddingId, storyId, story }: any,
+      context: any
+    ) => {
+      const user = await authenticateGraphQL(context);
+      const weddingDetailService = new WeddingDetailService();
+
+      return weddingDetailService.updateLoveStory(
         weddingId,
-        user._id.toString(),
+        user,
+        storyId,
         story
       );
     },
@@ -203,12 +208,31 @@ export const resolvers = {
       context: any
     ) => {
       const user = await authenticateGraphQL(context);
+      const service = new WeddingDetailService();
+
+      return service.addWeddingEvent(weddingId, user, event);
+    },
+
+    updateWeddingEvent: async (
+      _: any,
+      { weddingId, eventId, event }: any,
+      context: any
+    ) => {
+      const user = await authenticateGraphQL(context);
+      const service = new WeddingDetailService();
+
+      return service.updateWeddingEvent(weddingId, eventId, user, event);
+    },
+
+    deleteWeddingEvent: async (
+      _: any,
+      { weddingId, eventId }: { weddingId: string; eventId: string },
+      context: any
+    ) => {
+      const user = await authenticateGraphQL(context);
       const weddingDetailService = new WeddingDetailService();
-      return weddingDetailService.addWeddingEvent(
-        weddingId,
-        user._id.toString(),
-        event
-      );
+
+      return weddingDetailService.deleteWeddingEvent(weddingId, eventId, user);
     },
 
     // Guests

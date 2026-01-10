@@ -9,7 +9,7 @@ export declare class WeddingService {
     getWeddings(): Promise<IWedding[]>;
     getWeddingById(id: string, user?: IUser): Promise<IWedding | null>;
     getWeddingBySlug(slug: string, user?: IUser | null): Promise<IWedding | null>;
-    updateWedding(id: string, user: IUser, data: UpdateWeddingData): Promise<IWedding | null>;
+    updateWedding(id: string, data: UpdateWeddingData): Promise<IWedding | null>;
     deleteWedding(id: string, user?: IUser): Promise<IWedding | null>;
     publishWedding(id: string, user?: IUser): Promise<IWedding | null>;
     unpublishWedding(id: string, user?: IUser): Promise<IWedding | null>;
