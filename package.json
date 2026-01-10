@@ -7,7 +7,7 @@
     "dev": "ts-node-dev --respawn src/app.ts",
     "build": "tsc && yarn copy:graphql",
     "copy:graphql": "copyfiles -u 2 src/graphql/**/*.graphql dist/graphql",
-    "start": "node dist/app.js",
+    "start": "node src/app.ts",
     "test": "echo \"No tests yet\" && exit 0"
   },
   "dependencies": {
