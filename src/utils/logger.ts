@@ -6,15 +6,13 @@ const { combine, timestamp, printf, colorize, errors, splat, json } =
   winston.format;
 
 const isProd = process.env.NODE_ENV === "production";
-const isServerless = !!process.env.LAMBDA_TASK_ROOT;
 
-const logDir = isServerless ? "/tmp/logs" : "logs";
+const logDir = "logs";
 
-if (!isServerless && !fs.existsSync(logDir)) {
+if (!isProd && !fs.existsSync(logDir)) {
   fs.mkdirSync(logDir, { recursive: true });
 }
 
-// DEV FORMAT – HUMAN READABLE
 const devFormat = combine(
   colorize({ all: true }),
   timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
@@ -31,7 +29,6 @@ const devFormat = combine(
   })
 );
 
-// PROD FORMAT – JSON
 const prodFormat = combine(
   timestamp(),
   errors({ stack: true }),
@@ -39,14 +36,13 @@ const prodFormat = combine(
   json()
 );
 
-// LOGGER
 const logger = winston.createLogger({
   level: isProd ? "info" : "debug",
   format: isProd ? prodFormat : devFormat,
   transports: [
     new winston.transports.Console(),
 
-    ...(isServerless
+    ...(isProd
       ? []
       : [
           new winston.transports.File({
