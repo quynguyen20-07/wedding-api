@@ -6,10 +6,11 @@ const { combine, timestamp, printf, colorize, errors, splat, json } =
   winston.format;
 
 const isProd = process.env.NODE_ENV === "production";
+const isServerless = !!process.env.LAMBDA_TASK_ROOT;
 
-const logDir = process.env.VERCEL ? "/tmp/logs" : "logs";
+const logDir = isServerless ? "/tmp/logs" : "logs";
 
-if (!fs.existsSync(logDir)) {
+if (!isServerless && !fs.existsSync(logDir)) {
   fs.mkdirSync(logDir, { recursive: true });
 }
 
@@ -45,7 +46,7 @@ const logger = winston.createLogger({
   transports: [
     new winston.transports.Console(),
 
-    ...(process.env.VERCEL
+    ...(isServerless
       ? []
       : [
           new winston.transports.File({
