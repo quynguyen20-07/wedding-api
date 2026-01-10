@@ -92,48 +92,63 @@ exports.resolvers = {
         createWedding: async (_, args, context) => {
             const user = await (0, auth_1.authenticateGraphQL)(context);
             const weddingService = new services_1.WeddingService();
-            return weddingService.createWedding(user._id.toString(), args);
+            return weddingService.createWedding(user, args);
         },
         updateWedding: async (_, { id, ...data }, context) => {
             const user = await (0, auth_1.authenticateGraphQL)(context);
             const weddingService = new services_1.WeddingService();
-            return weddingService.updateWedding(id, user._id.toString(), data);
+            return weddingService.updateWedding(id, data);
         },
         deleteWedding: async (_, { id }, context) => {
             const user = await (0, auth_1.authenticateGraphQL)(context);
             const weddingService = new services_1.WeddingService();
-            return weddingService.deleteWedding(id, user._id.toString());
+            return weddingService.deleteWedding(id, user);
         },
         publishWedding: async (_, { id }, context) => {
             const user = await (0, auth_1.authenticateGraphQL)(context);
             const weddingService = new services_1.WeddingService();
-            return weddingService.publishWedding(id, user._id.toString());
+            return weddingService.publishWedding(id, user);
         },
         unpublishWedding: async (_, { id }, context) => {
             const user = await (0, auth_1.authenticateGraphQL)(context);
             const weddingService = new services_1.WeddingService();
-            return weddingService.unpublishWedding(id, user._id.toString());
+            return weddingService.unpublishWedding(id, user);
         },
         // Wedding Details
         updateBride: async (_, { weddingId, bride }, context) => {
             const user = await (0, auth_1.authenticateGraphQL)(context);
             const weddingDetailService = new services_1.WeddingDetailService();
-            return weddingDetailService.updateBride(weddingId, user._id.toString(), bride);
+            return weddingDetailService.updateBride(weddingId, user, bride);
         },
         updateGroom: async (_, { weddingId, groom }, context) => {
             const user = await (0, auth_1.authenticateGraphQL)(context);
             const weddingDetailService = new services_1.WeddingDetailService();
-            return weddingDetailService.updateGroom(weddingId, user._id.toString(), groom);
+            return weddingDetailService.updateGroom(weddingId, user, groom);
         },
         addLoveStory: async (_, { weddingId, story }, context) => {
             const user = await (0, auth_1.authenticateGraphQL)(context);
             const weddingDetailService = new services_1.WeddingDetailService();
-            return weddingDetailService.addLoveStory(weddingId, user._id.toString(), story);
+            return weddingDetailService.addLoveStory(weddingId, user, story);
+        },
+        updateLoveStory: async (_, { weddingId, storyId, story }, context) => {
+            const user = await (0, auth_1.authenticateGraphQL)(context);
+            const weddingDetailService = new services_1.WeddingDetailService();
+            return weddingDetailService.updateLoveStory(weddingId, user, storyId, story);
         },
         addWeddingEvent: async (_, { weddingId, event }, context) => {
             const user = await (0, auth_1.authenticateGraphQL)(context);
+            const service = new services_1.WeddingDetailService();
+            return service.addWeddingEvent(weddingId, user, event);
+        },
+        updateWeddingEvent: async (_, { weddingId, eventId, event }, context) => {
+            const user = await (0, auth_1.authenticateGraphQL)(context);
+            const service = new services_1.WeddingDetailService();
+            return service.updateWeddingEvent(weddingId, eventId, user, event);
+        },
+        deleteWeddingEvent: async (_, { weddingId, eventId }, context) => {
+            const user = await (0, auth_1.authenticateGraphQL)(context);
             const weddingDetailService = new services_1.WeddingDetailService();
-            return weddingDetailService.addWeddingEvent(weddingId, user._id.toString(), event);
+            return weddingDetailService.deleteWeddingEvent(weddingId, eventId, user);
         },
         // Guests
         submitRSVP: async (_, { weddingId, rsvp }) => {

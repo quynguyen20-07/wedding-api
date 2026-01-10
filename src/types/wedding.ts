@@ -100,3 +100,16 @@ export interface UpdateWeddingData {
     backgroundMusic?: string;
   };
 }
+
+export interface ICreateWeddingEvent {
+  title: string;
+  type: "ceremony" | "reception" | "party";
+  eventDate: Date;
+  startTime?: string;
+  endTime?: string;
+  address: string;
+  locationLat?: number;
+  locationLng?: number;
+  mapEmbedUrl?: string;
+  description?: string;
+}

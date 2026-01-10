@@ -8,6 +8,7 @@ import { generateSlug } from "../utils/helpers";
 import { IWedding } from "../models/Wedding";
 import { AppError } from "../utils/AppError";
 import { IUser } from "../models/User";
+import logger from "../utils/logger";
 
 export class WeddingService {
   private weddingRepository: WeddingRepository;
@@ -146,24 +147,27 @@ export class WeddingService {
 
   async updateWedding(
     id: string,
-    user: IUser,
     data: UpdateWeddingData
   ): Promise<IWedding | null> {
-    await this.getWeddingById(id, user?._id.toString());
+    const wedding = await this.weddingRepository.findById(id);
+    if (!wedding) {
+      throw new AppError("Đám cưới không tồn tại", HttpStatus.BAD_REQUEST);
+    }
 
-    // SỬA: Chỉ update những field được cung cấp
-    const updateData: any = {};
-    if (data.title) updateData.title = data.title;
-    if (data.slug) updateData.slug = data.slug;
-    if (data.language) updateData.language = data.language;
-    if (data.status) updateData.status = data.status;
+    logger.info("wedding", {
+      wedding,
+    });
+
+    const updateData: Partial<IWedding> = {};
+
+    if (data.title !== undefined) updateData.title = data.title;
+    if (data.language !== undefined) updateData.language = data.language;
+    if (data.status !== undefined) updateData.status = data.status;
+
     if (data.themeSettings) {
       updateData.themeSettings = {
-        primaryColor: data.themeSettings.primaryColor,
-        secondaryColor: data.themeSettings.secondaryColor,
-        fontHeading: data.themeSettings.fontHeading,
-        fontBody: data.themeSettings.fontBody,
-        backgroundMusic: data.themeSettings.backgroundMusic,
+        ...wedding.themeSettings,
+        ...data.themeSettings,
       };
     }
 

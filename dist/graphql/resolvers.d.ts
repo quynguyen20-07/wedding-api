@@ -65,7 +65,17 @@ export declare const resolvers: {
         addLoveStory: (_: any, { weddingId, story }: any, context: any) => Promise<import("mongoose").Document<unknown, {}, import("..").IWeddingDetail> & import("..").IWeddingDetail & {
             _id: import("mongoose").Types.ObjectId;
         }>;
+        updateLoveStory: (_: any, { weddingId, storyId, story }: any, context: any) => Promise<import("mongoose").Document<unknown, {}, import("..").IWeddingDetail> & import("..").IWeddingDetail & {
+            _id: import("mongoose").Types.ObjectId;
+        }>;
         addWeddingEvent: (_: any, { weddingId, event }: any, context: any) => Promise<import("mongoose").Document<unknown, {}, import("..").IWeddingDetail> & import("..").IWeddingDetail & {
+            _id: import("mongoose").Types.ObjectId;
+        }>;
+        updateWeddingEvent: (_: any, { weddingId, eventId, event }: any, context: any) => Promise<boolean>;
+        deleteWeddingEvent: (_: any, { weddingId, eventId }: {
+            weddingId: string;
+            eventId: string;
+        }, context: any) => Promise<import("mongoose").Document<unknown, {}, import("..").IWeddingDetail> & import("..").IWeddingDetail & {
             _id: import("mongoose").Types.ObjectId;
         }>;
         submitRSVP: (_: any, { weddingId, rsvp }: any) => Promise<import("..").IGuest>;
