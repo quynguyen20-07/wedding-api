@@ -5,10 +5,13 @@
   "main": "src/app.ts",
   "scripts": {
     "dev": "ts-node-dev --respawn src/app.ts",
-    "build": "tsc && yarn copy:graphql",
     "copy:graphql": "copyfiles -u 2 src/graphql/**/*.graphql dist/graphql",
     "start": "node dist/app.js",
-    "test": "echo \"No tests yet\" && exit 0"
+    "test": "echo \"No tests yet\" && exit 0",
+    "build": "npm run clean && npm run compile",
+    "clean": "rimraf dist",
+    "compile": "tsc  && yarn copy:graphql",
+    "vercel-build": "npm run clean && npm run compile"
   },
   "dependencies": {
     "apollo-server-express": "^3.13.0",
