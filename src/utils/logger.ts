@@ -1,5 +1,7 @@
 import winston from "winston";
 
+console.log("LOGGER INIT: USING ONLY CONSOLE TRANSPORT - NO FILE LOGS");
+
 const isProd = process.env.NODE_ENV === "production";
 
 const createLogger = () => {
