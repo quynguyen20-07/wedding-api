@@ -1,8 +1,9 @@
-import { Request, Response, NextFunction } from "express";
-import jwt from "jsonwebtoken";
+import jwt, { TokenExpiredError, JsonWebTokenError } from "jsonwebtoken";
+import { NextFunction, Request, Response } from "express";
 
 import { AppError } from "../utils/AppError";
 import { User } from "../models/User";
+import logger from "../utils/logger";
 
 export interface AuthRequest extends Request {
   user?: any;
@@ -13,22 +14,44 @@ export interface AuthRequest extends Request {
  * CORE: verify token & get user
  * ===============================
  */
-const verifyTokenAndGetUser = async (token?: string) => {
-  if (!token) return null;
+const verifyTokenAndGetUser = async (authenticate?: string) => {
+  if (!authenticate) {
+    throw new AppError("Authentication required", 401);
+  }
 
-  const cleanToken = token.startsWith("Bearer ")
-    ? token.replace("Bearer ", "").trim()
-    : token;
+  const token = authenticate.startsWith("Bearer ")
+    ? authenticate.replace("Bearer ", "").trim()
+    : authenticate;
 
   try {
-    const decoded = jwt.verify(cleanToken, process.env.JWT_SECRET!) as any;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
 
     const user = await User.findById(decoded.userId);
-    if (!user || !user.isActive) return null;
+
+    if (!user) {
+      throw new AppError("User not found", 401);
+    }
+
+    if (!user.isActive) {
+      throw new AppError("User is inactive", 403);
+    }
 
     return user;
-  } catch {
-    return null;
+  } catch (error) {
+    if (error instanceof TokenExpiredError) {
+      throw new AppError("Token expired", 401);
+    }
+
+    if (error instanceof JsonWebTokenError) {
+      throw new AppError("Invalid token", 401);
+    }
+
+    if (error instanceof AppError) {
+      throw error;
+    }
+
+    logger.error("JWT verify failed", { error });
+    throw new AppError("Authentication failed", 401);
   }
 };
 

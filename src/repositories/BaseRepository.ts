@@ -1,5 +1,4 @@
-import { Model, Document, FilterQuery, UpdateQuery } from 'mongoose';
-
+import { Model, Document, FilterQuery, UpdateQuery } from "mongoose";
 
 export abstract class BaseRepository<T extends Document> {
   protected model: Model<T>;
@@ -29,11 +28,7 @@ export abstract class BaseRepository<T extends Document> {
   }
 
   async delete(id: string): Promise<T | null> {
-    return this.model.findByIdAndUpdate(
-      id,
-      { isActive: false },
-      { new: true }
-    );
+    return this.model.findByIdAndUpdate(id, { isActive: false }, { new: true });
   }
 
   async count(filter: FilterQuery<T> = {}): Promise<number> {
