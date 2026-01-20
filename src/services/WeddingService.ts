@@ -111,7 +111,7 @@ export class WeddingService {
   async getWeddingById(id: string, user?: IUser): Promise<IWedding | null> {
     const wedding = await this.weddingRepository.findById(id);
 
-    if (!wedding || !wedding.isActive) {
+    if (!wedding) {
       throw new AppError("Wedding not found", HttpStatus.NOT_FOUND);
     }
 
@@ -154,10 +154,6 @@ export class WeddingService {
       throw new AppError("Đám cưới không tồn tại", HttpStatus.BAD_REQUEST);
     }
 
-    logger.info("wedding", {
-      wedding,
-    });
-
     const updateData: Partial<IWedding> = {};
 
     if (data.title !== undefined) updateData.title = data.title;
@@ -175,7 +171,18 @@ export class WeddingService {
   }
 
   async deleteWedding(id: string, user?: IUser): Promise<IWedding | null> {
-    await this.getWeddingById(id, user);
+    const wedding = await this.weddingRepository.findById(id);
+    if (!wedding) {
+      throw new AppError("Wedding not found", HttpStatus.NOT_FOUND);
+    }
+
+    if (
+      user?.role !== "admin" &&
+      wedding.userId.toString() !== user?._id.toString()
+    ) {
+      throw new AppError("Unauthorized", HttpStatus.FORBIDDEN);
+    }
+
     return this.weddingRepository.delete(id);
   }
 
