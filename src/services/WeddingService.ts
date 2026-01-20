@@ -127,7 +127,7 @@ export class WeddingService {
 
   async getWeddingBySlug(
     slug: string,
-    user?: IUser | null
+    user?: IUser | null,
   ): Promise<IWedding | null> {
     let isActive: boolean | undefined = undefined;
     if (user?.role !== "admin") {
@@ -147,7 +147,7 @@ export class WeddingService {
 
   async updateWedding(
     id: string,
-    data: UpdateWeddingData
+    data: UpdateWeddingData,
   ): Promise<IWedding | null> {
     const wedding = await this.weddingRepository.findById(id);
     if (!wedding) {
@@ -175,12 +175,12 @@ export class WeddingService {
   }
 
   async deleteWedding(id: string, user?: IUser): Promise<IWedding | null> {
-    await this.getWeddingById(id, user?._id.toString());
+    await this.getWeddingById(id, user);
     return this.weddingRepository.delete(id);
   }
 
   async publishWedding(id: string, user?: IUser): Promise<IWedding | null> {
-    await this.getWeddingById(id, user?._id.toString());
+    await this.getWeddingById(id, user);
     return this.weddingRepository.publishWedding(id);
   }
 
