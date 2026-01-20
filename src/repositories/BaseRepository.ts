@@ -27,8 +27,12 @@ export abstract class BaseRepository<T extends Document> {
     return this.model.findByIdAndUpdate(id, data, { new: true });
   }
 
-  async delete(id: string): Promise<T | null> {
+  async softDelete(id: string): Promise<T | null> {
     return this.model.findByIdAndUpdate(id, { isActive: false }, { new: true });
+  }
+
+  async delete(id: string): Promise<T | null> {
+    return this.model.findByIdAndDelete(id);
   }
 
   async count(filter: FilterQuery<T> = {}): Promise<number> {

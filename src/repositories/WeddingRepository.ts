@@ -14,6 +14,10 @@ export class WeddingRepository extends BaseRepository<IWedding> {
     return this.findAll();
   }
 
+  async delete(id: string): Promise<IWedding | null> {
+    return this.model.findByIdAndDelete(id);
+  }
+
   async findBySlug(slug: string, isActive?: boolean): Promise<IWedding | null> {
     const query: Record<string, unknown> = { slug };
 
@@ -28,7 +32,7 @@ export class WeddingRepository extends BaseRepository<IWedding> {
     return this.model.findOneAndUpdate(
       { slug },
       { $inc: { viewCount: 1 } },
-      { new: true }
+      { new: true },
     );
   }
 
